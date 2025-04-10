@@ -2,60 +2,71 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:orientation="vertical"
     android:layout_width="match_parent"
+    android:background="@color/white"
     android:layout_height="wrap_content">
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:layout_gravity="center"
         android:orientation="horizontal"
         android:gravity="center"
-        android:layout_gravity="center"
         android:weightSum="11">
+
         <Button
             android:id="@+id/btn1"
             style="@style/buttonTheme"
             android:layout_weight="1"
             android:text="1" />
+
         <Button
             android:id="@+id/btn2"
             style="@style/buttonTheme"
             android:layout_weight="1"
             android:text="2" />
+
         <Button
             android:id="@+id/btn3"
             style="@style/buttonTheme"
             android:layout_weight="1"
             android:text="3" />
+
         <Button
             android:id="@+id/btn4"
             style="@style/buttonTheme"
             android:layout_weight="1"
             android:text="4" />
+
         <Button
             android:id="@+id/btn5"
             style="@style/buttonTheme"
             android:layout_weight="1"
             android:text="5" />
+
         <Button
             android:id="@+id/btn6"
             style="@style/buttonTheme"
             android:layout_weight="1"
             android:text="6" />
+
         <Button
             android:id="@+id/btn7"
             style="@style/buttonTheme"
             android:layout_weight="1"
             android:text="7" />
+
         <Button
             android:id="@+id/btn8"
             style="@style/buttonTheme"
             android:layout_weight="1"
             android:text="8" />
+
         <Button
             android:id="@+id/btn9"
             style="@style/buttonTheme"
             android:layout_weight="1"
             android:text="9" />
+
         <Button
             android:id="@+id/btn0"
             style="@style/buttonTheme"
@@ -66,55 +77,65 @@
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="horizontal"
-        android:gravity="center"
         android:layout_gravity="center"
+        android:gravity="center"
+        android:orientation="horizontal"
         android:weightSum="11">
+
         <Button
             android:id="@+id/btnq"
             style="@style/buttonTheme"
             android:layout_weight="1"
             android:text="q" />
+
         <Button
             android:id="@+id/btnw"
             style="@style/buttonTheme"
             android:layout_weight="1"
             android:text="w" />
+
         <Button
             android:id="@+id/btne"
             style="@style/buttonTheme"
             android:layout_weight="1"
             android:text="e" />
+
         <Button
             android:id="@+id/btnr"
             style="@style/buttonTheme"
             android:layout_weight="1"
             android:text="r" />
+
         <Button
             android:id="@+id/btnt"
             style="@style/buttonTheme"
             android:layout_weight="1"
             android:text="t" />
+
         <Button
             android:id="@+id/btny"
             style="@style/buttonTheme"
             android:layout_weight="1"
             android:text="y" />
+
         <Button
             android:id="@+id/btnu"
             style="@style/buttonTheme"
             android:layout_weight="1"
             android:text="u" />
+
         <Button
             android:id="@+id/btni"
             style="@style/buttonTheme"
             android:layout_weight="1"
             android:text="i" />
+
         <Button
             android:id="@+id/btno"
             style="@style/buttonTheme"
             android:layout_weight="1"
             android:text="o" />
+
         <Button
             android:id="@+id/btnp"
             style="@style/buttonTheme"
@@ -125,50 +146,59 @@
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="horizontal"
-        android:gravity="center"
         android:layout_gravity="center"
+        android:gravity="center"
+        android:orientation="horizontal"
         android:weightSum="11">
+
         <Button
             android:id="@+id/btna"
             style="@style/buttonTheme"
             android:layout_weight="1"
             android:text="a" />
+
         <Button
             android:id="@+id/btns"
             style="@style/buttonTheme"
             android:layout_weight="1"
             android:text="s" />
+
         <Button
             android:id="@+id/btnd"
             style="@style/buttonTheme"
             android:layout_weight="1"
             android:text="d" />
+
         <Button
             android:id="@+id/btnf"
             style="@style/buttonTheme"
             android:layout_weight="1"
             android:text="f" />
+
         <Button
             android:id="@+id/btng"
             style="@style/buttonTheme"
             android:layout_weight="1"
             android:text="g" />
+
         <Button
             android:id="@+id/btnh"
             style="@style/buttonTheme"
             android:layout_weight="1"
             android:text="h" />
+
         <Button
             android:id="@+id/btnj"
             style="@style/buttonTheme"
             android:layout_weight="1"
             android:text="j" />
+
         <Button
             android:id="@+id/btnk"
             style="@style/buttonTheme"
             android:layout_weight="1"
             android:text="k" />
+
         <Button
             android:id="@+id/btnl"
             style="@style/buttonTheme"
@@ -179,50 +209,59 @@
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="horizontal"
-        android:gravity="center"
         android:layout_gravity="center"
+        android:gravity="center"
+        android:orientation="horizontal"
         android:weightSum="11">
+
         <Button
             android:id="@+id/btnUp"
             style="@style/buttonTheme"
             android:layout_weight="2"
             android:text="UP" />
+
         <Button
             android:id="@+id/btnz"
             style="@style/buttonTheme"
             android:layout_weight="1"
             android:text="z" />
+
         <Button
             android:id="@+id/btnx"
             style="@style/buttonTheme"
             android:layout_weight="1"
             android:text="x" />
+
         <Button
             android:id="@+id/btnc"
             style="@style/buttonTheme"
             android:layout_weight="1"
             android:text="c" />
+
         <Button
             android:id="@+id/btnv"
             style="@style/buttonTheme"
             android:layout_weight="1"
             android:text="v" />
+
         <Button
             android:id="@+id/btnb"
             style="@style/buttonTheme"
             android:layout_weight="1"
             android:text="b" />
+
         <Button
             android:id="@+id/btnn"
             style="@style/buttonTheme"
             android:layout_weight="1"
             android:text="n" />
+
         <Button
             android:id="@+id/btnm"
             style="@style/buttonTheme"
             android:layout_weight="1"
             android:text="m" />
+
         <Button
             android:id="@+id/btnDelete"
             style="@style/buttonTheme"
@@ -233,39 +272,50 @@
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="horizontal"
-        android:gravity="center"
         android:layout_gravity="center"
+        android:gravity="center"
+        android:orientation="horizontal"
         android:weightSum="11">
+
         <Button
             android:id="@+id/btnNumbers"
             style="@style/buttonTheme"
             android:layout_weight="1"
             android:text="123" />
+
         <Button
             android:id="@+id/btnVoiceInput"
             style="@style/buttonTheme"
             android:layout_weight="1"
             android:text="Micro" />
+
         <Button
             android:id="@+id/btnComma"
             style="@style/buttonTheme"
             android:layout_weight="1"
             android:text="," />
+
         <Button
             android:id="@+id/btnSpace"
             style="@style/buttonTheme"
             android:layout_weight="5"
             android:text="Space" />
+
         <Button
             android:id="@+id/btnPoint"
             style="@style/buttonTheme"
             android:layout_weight="1"
             android:text="." />
+
         <Button
             android:id="@+id/btnEnter"
             style="@style/buttonTheme"
             android:layout_weight="2"
             android:text="Enter" />
     </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="64dp"
+        android:orientation="horizontal"></LinearLayout>
 </LinearLayout>

@@ -11,54 +11,27 @@ import com.example.keyboard.databinding.ActivityMainBinding
 
 class MainActivity : AppCompatActivity() {
     private lateinit var binding : ActivityMainBinding
-//    override fun onCreate(savedInstanceState: Bundle?) {
-//        super.onCreate(savedInstanceState)
-//        binding = ActivityMainBinding.inflate(layoutInflater)
-//        setContentView(binding.root)
-//        binding.apply{
-//            if (isKeyboardEnable()){
-//                btnEnableKeyboard.isEnabled = false
-//            }
-//            btnEnableKeyboard.setOnClickListener{
-//                if(!isKeyboardEnable()){
-//                    keyboardSetting()
-//                }
-//            }
-//            btnChooseKeyboard.setOnClickListener{
-//                if(isKeyboardEnable()){
-//                    keyboardSetting()
-//                }
-//                else{
-//                    Toast.makeText(this@MainActivity, "Test", Toast.LENGTH_SHORT).show()
-//                }
-//            }
-//        }
-//    }
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        try {
-            binding = ActivityMainBinding.inflate(layoutInflater)
-            setContentView(binding.root)
-            binding.apply {
-                if (isKeyboardEnable()) {
-                    btnEnableKeyboard.isEnabled = false
-                }
-                btnEnableKeyboard.setOnClickListener {
-                    if (!isKeyboardEnable()) {
-                        keyboardSetting()
-                    }
-                }
-                btnChooseKeyboard.setOnClickListener {
-                    if (isKeyboardEnable()) {
-                        keyboardChoose()
-                    } else {
-                        Toast.makeText(this@MainActivity, "Test", Toast.LENGTH_SHORT).show()
-                    }
+        binding = ActivityMainBinding.inflate(layoutInflater)
+        setContentView(binding.root)
+        binding.apply{
+            if (isKeyboardEnable()){
+                btnEnableKeyboard.isEnabled = false
+            }
+            btnEnableKeyboard.setOnClickListener{
+                if(!isKeyboardEnable()){
+                    keyboardSetting()
                 }
             }
-        } catch (e: Exception) {
-            e.printStackTrace()
-            Toast.makeText(this, "Error: ${e.message}", Toast.LENGTH_LONG).show()
+            btnChooseKeyboard.setOnClickListener{
+                if(isKeyboardEnable()){
+                    keyboardChoose()
+                }
+                else{
+                    Toast.makeText(this@MainActivity, "Test", Toast.LENGTH_SHORT).show()
+                }
+            }
         }
     }
     private fun isKeyboardEnable() : Boolean{

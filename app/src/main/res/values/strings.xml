@@ -1,0 +1,7 @@
+<resources>
+    <string name="app_name">Keyboard</string>
+    <string name="mykeyboard">Keyboard for Diploma</string>
+    <string name="enable_keyboard">Enable Keyboard</string>
+    <string name="choose_keyboard">Choose Keyboard</string>
+    <string name="mykeyboarddescription">Create your first custom keyboard application</string>
+</resources>

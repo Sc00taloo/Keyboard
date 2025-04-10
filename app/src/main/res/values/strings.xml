@@ -6,6 +6,8 @@
     <string name="mykeyboarddescription">Create your first custom keyboard application</string>
 
     <string name="currency">$</string>
+    <string name="currencyRU">₽</string>
     <string name="currency_swap">₽</string>
+    <string name="currency_swapEN">$</string>
     <string name="quote_symbol">\"</string>
 </resources>

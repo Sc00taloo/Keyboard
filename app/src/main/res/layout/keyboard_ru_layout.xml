@@ -11,67 +11,73 @@
         android:layout_gravity="center"
         android:gravity="center"
         android:orientation="horizontal"
-        android:weightSum="10">
+        android:weightSum="11">
 
         <Button
-            android:id="@+id/btnq"
+            android:id="@+id/btnй"
             style="@style/buttonTheme"
             android:layout_weight="1"
-            android:text="q" />
+            android:text="й" />
 
         <Button
-            android:id="@+id/btnw"
+            android:id="@+id/btnц"
             style="@style/buttonTheme"
             android:layout_weight="1"
-            android:text="w" />
+            android:text="ц" />
 
         <Button
-            android:id="@+id/btne"
+            android:id="@+id/btnу"
             style="@style/buttonTheme"
             android:layout_weight="1"
-            android:text="e" />
+            android:text="у" />
 
         <Button
-            android:id="@+id/btnr"
+            android:id="@+id/btnк"
             style="@style/buttonTheme"
             android:layout_weight="1"
-            android:text="r" />
+            android:text="к" />
 
         <Button
-            android:id="@+id/btnt"
+            android:id="@+id/btnе"
             style="@style/buttonTheme"
             android:layout_weight="1"
-            android:text="t" />
+            android:text="е" />
 
         <Button
-            android:id="@+id/btny"
+            android:id="@+id/btnн"
             style="@style/buttonTheme"
             android:layout_weight="1"
-            android:text="y" />
+            android:text="н" />
 
         <Button
-            android:id="@+id/btnu"
+            android:id="@+id/btnг"
             style="@style/buttonTheme"
             android:layout_weight="1"
-            android:text="u" />
+            android:text="г" />
 
         <Button
-            android:id="@+id/btni"
+            android:id="@+id/btnш"
             style="@style/buttonTheme"
             android:layout_weight="1"
-            android:text="i" />
+            android:text="ш" />
 
         <Button
-            android:id="@+id/btno"
+            android:id="@+id/btnщ"
             style="@style/buttonTheme"
             android:layout_weight="1"
-            android:text="o" />
+            android:text="щ" />
 
         <Button
-            android:id="@+id/btnp"
+            android:id="@+id/btnз"
             style="@style/buttonTheme"
             android:layout_weight="1"
-            android:text="p" />
+            android:text="з" />
+
+        <Button
+            android:id="@+id/btnх"
+            style="@style/buttonTheme"
+            android:layout_weight="1"
+            android:text="х" />
     </LinearLayout>
 
     <LinearLayout
@@ -80,61 +86,73 @@
         android:layout_gravity="center"
         android:gravity="center"
         android:orientation="horizontal"
-        android:weightSum="10">
+        android:weightSum="11">
 
         <Button
-            android:id="@+id/btna"
+            android:id="@+id/btnф"
             style="@style/buttonTheme"
             android:layout_weight="1"
-            android:text="a" />
+            android:text="ф" />
 
         <Button
-            android:id="@+id/btns"
+            android:id="@+id/btnы"
             style="@style/buttonTheme"
             android:layout_weight="1"
-            android:text="s" />
+            android:text="ы" />
 
         <Button
-            android:id="@+id/btnd"
+            android:id="@+id/btnв"
             style="@style/buttonTheme"
             android:layout_weight="1"
-            android:text="d" />
+            android:text="в" />
 
         <Button
-            android:id="@+id/btnf"
+            android:id="@+id/btnа"
             style="@style/buttonTheme"
             android:layout_weight="1"
-            android:text="f" />
+            android:text="а" />
 
         <Button
-            android:id="@+id/btng"
+            android:id="@+id/btnп"
             style="@style/buttonTheme"
             android:layout_weight="1"
-            android:text="g" />
+            android:text="п" />
 
         <Button
-            android:id="@+id/btnh"
+            android:id="@+id/btnр"
             style="@style/buttonTheme"
             android:layout_weight="1"
-            android:text="h" />
+            android:text="р" />
 
         <Button
-            android:id="@+id/btnj"
+            android:id="@+id/btnо"
             style="@style/buttonTheme"
             android:layout_weight="1"
-            android:text="j" />
+            android:text="о" />
 
         <Button
-            android:id="@+id/btnk"
+            android:id="@+id/btnл"
             style="@style/buttonTheme"
             android:layout_weight="1"
-            android:text="k" />
+            android:text="л" />
 
         <Button
-            android:id="@+id/btnl"
+            android:id="@+id/btnд"
             style="@style/buttonTheme"
             android:layout_weight="1"
-            android:text="l" />
+            android:text="д" />
+
+        <Button
+            android:id="@+id/btnж"
+            style="@style/buttonTheme"
+            android:layout_weight="1"
+            android:text="ж" />
+
+        <Button
+            android:id="@+id/btnэ"
+            style="@style/buttonTheme"
+            android:layout_weight="1"
+            android:text="э" />
     </LinearLayout>
 
     <LinearLayout
@@ -143,60 +161,72 @@
         android:layout_gravity="center"
         android:gravity="center"
         android:orientation="horizontal"
-        android:weightSum="10">
+        android:weightSum="11">
 
         <Button
             android:id="@+id/btnUp"
             style="@style/buttonTheme"
-            android:layout_weight="1.5"
+            android:layout_weight="1"
             android:text="UP" />
 
         <Button
-            android:id="@+id/btnz"
+            android:id="@+id/btnя"
             style="@style/buttonTheme"
             android:layout_weight="1"
-            android:text="z" />
+            android:text="я" />
 
         <Button
-            android:id="@+id/btnx"
+            android:id="@+id/btnч"
             style="@style/buttonTheme"
             android:layout_weight="1"
-            android:text="x" />
+            android:text="ч" />
 
         <Button
-            android:id="@+id/btnc"
+            android:id="@+id/btnс"
             style="@style/buttonTheme"
             android:layout_weight="1"
-            android:text="c" />
+            android:text="с" />
 
         <Button
-            android:id="@+id/btnv"
+            android:id="@+id/btnм"
             style="@style/buttonTheme"
             android:layout_weight="1"
-            android:text="v" />
+            android:text="м" />
 
         <Button
-            android:id="@+id/btnb"
+            android:id="@+id/btnи"
             style="@style/buttonTheme"
             android:layout_weight="1"
-            android:text="b" />
+            android:text="и" />
 
         <Button
-            android:id="@+id/btnn"
+            android:id="@+id/btnт"
             style="@style/buttonTheme"
             android:layout_weight="1"
-            android:text="n" />
+            android:text="т" />
 
         <Button
-            android:id="@+id/btnm"
+            android:id="@+id/btnь"
             style="@style/buttonTheme"
             android:layout_weight="1"
-            android:text="m" />
+            android:text="ь" />
+
+        <Button
+            android:id="@+id/btnб"
+            style="@style/buttonTheme"
+            android:layout_weight="1"
+            android:text="б" />
+
+        <Button
+            android:id="@+id/btnю"
+            style="@style/buttonTheme"
+            android:layout_weight="1"
+            android:text="ю" />
 
         <Button
             android:id="@+id/btnDelete"
             style="@style/buttonTheme"
-            android:layout_weight="1.5"
+            android:layout_weight="1"
             android:text="Back" />
     </LinearLayout>
 
@@ -230,7 +260,7 @@
             android:id="@+id/btnSpace"
             style="@style/buttonTheme"
             android:layout_weight="4.5"
-            android:text="&lt; English &gt;" />
+            android:text="&lt; Русский &gt;" />
 
         <Button
             android:id="@+id/btnPoint"
@@ -248,5 +278,6 @@
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="64dp"
-        android:orientation="horizontal"></LinearLayout>
+        android:orientation="horizontal">
+    </LinearLayout>
 </LinearLayout>

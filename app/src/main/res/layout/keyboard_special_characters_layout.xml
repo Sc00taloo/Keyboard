@@ -92,7 +92,7 @@
             android:id="@+id/btnSlashRight"
             style="@style/buttonTheme"
             android:layout_weight="1"
-            android:text="\" />
+            android:text="\\" />
 
         <Button
             android:id="@+id/btnStick"
@@ -218,7 +218,7 @@
             android:id="@+id/btnSpace"
             style="@style/buttonTheme"
             android:layout_weight="4.5"
-            android:text="Space" />
+            android:text="&lt; English &gt;" />
 
         <Button
             android:id="@+id/btnEnter"

@@ -4,4 +4,8 @@
     <string name="enable_keyboard">Enable Keyboard</string>
     <string name="choose_keyboard">Choose Keyboard</string>
     <string name="mykeyboarddescription">Create your first custom keyboard application</string>
+
+    <string name="currency">$</string>
+    <string name="currency_swap">₽</string>
+    <string name="quote_symbol">\"</string>
 </resources>

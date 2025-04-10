@@ -12,10 +12,12 @@ class Keyboard : InputMethodService() {
     private var lastClick = 0L
     private val doubleClickThreshold = 500
 
+    val keyboardNumbers = KeyboardNumbers(this)
+    private val keyboardSpecialCharacters = KeyboardSpecialCharacters(this)
+
     override fun onCreateInputView(): View {
         val keyboarding = KeyboardLayoutBinding.inflate(layoutInflater)
         val buttonList = arrayOf(
-            R.id.btn1, R.id.btn2, R.id.btn3, R.id.btn4, R.id.btn5, R.id.btn6, R.id.btn7, R.id.btn8, R.id.btn9, R.id.btn0,
             R.id.btnq, R.id.btnw, R.id.btne, R.id.btnr, R.id.btnt, R.id.btny, R.id.btnu, R.id.btni, R.id.btno, R.id.btnp,
             R.id.btna, R.id.btns, R.id.btnd, R.id.btnf, R.id.btng, R.id.btnh, R.id.btnj, R.id.btnk, R.id.btnl, R.id.btnz,
             R.id.btnx, R.id.btnc, R.id.btnv, R.id.btnb, R.id.btnn, R.id.btnm, R.id.btnComma, R.id.btnPoint
@@ -57,9 +59,7 @@ class Keyboard : InputMethodService() {
             lastClick = currentTime
         }
         keyboarding.btnNumbers.setOnClickListener{
-            val input = currentInputConnection
-            input?.sendKeyEvent(KeyEvent(KeyEvent.ACTION_DOWN, KeyEvent.KEYCODE_DEL))
-            return@setOnClickListener
+            setInputView(keyboardNumbers.onCreateInputView())
         }
         //// NEED!!!!!!!!!!!!!!!!!!!!!
         keyboarding.btnVoiceInput.setOnClickListener{
@@ -88,6 +88,8 @@ class Keyboard : InputMethodService() {
             button.text = if (capsLockFull || capsLockOne) baseText.uppercase() else baseText
         }
     }
+
+    fun getKeyboardSpecialCharacters(): KeyboardSpecialCharacters = keyboardSpecialCharacters
 }
 
 

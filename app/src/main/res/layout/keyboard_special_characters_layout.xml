@@ -9,69 +9,69 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_gravity="center"
-        android:gravity="center"
         android:orientation="horizontal"
+        android:gravity="center"
         android:weightSum="10">
 
         <Button
-            android:id="@+id/btnq"
+            android:id="@+id/btnQuadraBracketLeft"
             style="@style/buttonTheme"
             android:layout_weight="1"
-            android:text="q" />
+            android:text="[" />
 
         <Button
-            android:id="@+id/btnw"
+            android:id="@+id/btnQuadraBracketRight"
             style="@style/buttonTheme"
             android:layout_weight="1"
-            android:text="w" />
+            android:text="]" />
 
         <Button
-            android:id="@+id/btne"
+            android:id="@+id/btnCurlyBracketLeft"
             style="@style/buttonTheme"
             android:layout_weight="1"
-            android:text="e" />
+            android:text="{" />
 
         <Button
-            android:id="@+id/btnr"
+            android:id="@+id/btnCurlyBracketRight"
             style="@style/buttonTheme"
             android:layout_weight="1"
-            android:text="r" />
+            android:text="}" />
 
         <Button
-            android:id="@+id/btnt"
+            android:id="@+id/btnLattice"
             style="@style/buttonTheme"
             android:layout_weight="1"
-            android:text="t" />
+            android:text="#" />
 
         <Button
-            android:id="@+id/btny"
+            android:id="@+id/btnPercent"
             style="@style/buttonTheme"
             android:layout_weight="1"
-            android:text="y" />
+            android:text="%" />
 
         <Button
-            android:id="@+id/btnu"
+            android:id="@+id/btnDegree"
             style="@style/buttonTheme"
             android:layout_weight="1"
-            android:text="u" />
+            android:text="^" />
 
         <Button
-            android:id="@+id/btni"
+            android:id="@+id/btnStar"
             style="@style/buttonTheme"
             android:layout_weight="1"
-            android:text="i" />
+            android:text="*" />
 
         <Button
-            android:id="@+id/btno"
+            android:id="@+id/btnPlus"
             style="@style/buttonTheme"
             android:layout_weight="1"
-            android:text="o" />
+            android:text="+" />
 
         <Button
-            android:id="@+id/btnp"
+            android:id="@+id/btnEqual"
             style="@style/buttonTheme"
             android:layout_weight="1"
-            android:text="p" />
+            android:text="=" />
     </LinearLayout>
 
     <LinearLayout
@@ -83,58 +83,64 @@
         android:weightSum="10">
 
         <Button
-            android:id="@+id/btna"
+            android:id="@+id/btnUnderscores"
             style="@style/buttonTheme"
             android:layout_weight="1"
-            android:text="a" />
+            android:text="_" />
 
         <Button
-            android:id="@+id/btns"
+            android:id="@+id/btnSlashRight"
             style="@style/buttonTheme"
             android:layout_weight="1"
-            android:text="s" />
+            android:text="\" />
 
         <Button
-            android:id="@+id/btnd"
+            android:id="@+id/btnStick"
             style="@style/buttonTheme"
             android:layout_weight="1"
-            android:text="d" />
+            android:text="|" />
 
         <Button
-            android:id="@+id/btnf"
+            android:id="@+id/btnFloatingStick"
             style="@style/buttonTheme"
             android:layout_weight="1"
-            android:text="f" />
+            android:text="~" />
 
         <Button
-            android:id="@+id/btng"
+            android:id="@+id/btnAngleBracketLeft"
             style="@style/buttonTheme"
             android:layout_weight="1"
-            android:text="g" />
+            android:text="&lt;" />
 
         <Button
-            android:id="@+id/btnh"
+            android:id="@+id/btnAngleBracketRight"
             style="@style/buttonTheme"
             android:layout_weight="1"
-            android:text="h" />
+            android:text="&gt;" />
 
         <Button
-            android:id="@+id/btnj"
+            android:id="@+id/btnCurrencySwap"
             style="@style/buttonTheme"
             android:layout_weight="1"
-            android:text="j" />
+            android:text="@string/currency_swap" />
 
         <Button
-            android:id="@+id/btnk"
+            android:id="@+id/btnCurrencyEuro"
             style="@style/buttonTheme"
             android:layout_weight="1"
-            android:text="k" />
+            android:text="€" />
 
         <Button
-            android:id="@+id/btnl"
+            android:id="@+id/btnCurrencyFunt"
             style="@style/buttonTheme"
             android:layout_weight="1"
-            android:text="l" />
+            android:text="£" />
+
+        <Button
+            android:id="@+id/btnCentrePoint"
+            style="@style/buttonTheme"
+            android:layout_weight="1"
+            android:text="·"/>
     </LinearLayout>
 
     <LinearLayout
@@ -143,58 +149,46 @@
         android:layout_gravity="center"
         android:gravity="center"
         android:orientation="horizontal"
-        android:weightSum="10">
+        android:weightSum="8">
 
         <Button
-            android:id="@+id/btnUp"
+            android:id="@id/btnNumbers"
             style="@style/buttonTheme"
             android:layout_weight="1.5"
-            android:text="UP" />
+            android:text="123" />
 
         <Button
-            android:id="@+id/btnz"
+            android:id="@id/btnPoint"
             style="@style/buttonTheme"
             android:layout_weight="1"
-            android:text="z" />
+            android:text="." />
 
         <Button
-            android:id="@+id/btnx"
+            android:id="@id/btnComma"
             style="@style/buttonTheme"
             android:layout_weight="1"
-            android:text="x" />
+            android:text="," />
 
         <Button
-            android:id="@+id/btnc"
+            android:id="@id/btnQuestion"
             style="@style/buttonTheme"
             android:layout_weight="1"
-            android:text="c" />
+            android:text="\?" />
 
         <Button
-            android:id="@+id/btnv"
+            android:id="@id/btnExclamation"
             style="@style/buttonTheme"
             android:layout_weight="1"
-            android:text="v" />
+            android:text="\!" />
 
         <Button
-            android:id="@+id/btnb"
+            android:id="@id/btnMiniQuotes"
             style="@style/buttonTheme"
             android:layout_weight="1"
-            android:text="b" />
+            android:text="'" />
 
         <Button
-            android:id="@+id/btnn"
-            style="@style/buttonTheme"
-            android:layout_weight="1"
-            android:text="n" />
-
-        <Button
-            android:id="@+id/btnm"
-            style="@style/buttonTheme"
-            android:layout_weight="1"
-            android:text="m" />
-
-        <Button
-            android:id="@+id/btnDelete"
+            android:id="@id/btnDelete"
             style="@style/buttonTheme"
             android:layout_weight="1.5"
             android:text="Back" />
@@ -206,13 +200,13 @@
         android:layout_gravity="center"
         android:gravity="center"
         android:orientation="horizontal"
-        android:weightSum="10">
+        android:weightSum="9">
 
         <Button
-            android:id="@+id/btnNumbers"
+            android:id="@+id/btnBaseKeyboard"
             style="@style/buttonTheme"
             android:layout_weight="1"
-            android:text="123" />
+            android:text="ABC" />
 
         <Button
             android:id="@+id/btnVoiceInput"
@@ -221,27 +215,15 @@
             android:text="Micro" />
 
         <Button
-            android:id="@+id/btnComma"
-            style="@style/buttonTheme"
-            android:layout_weight="1"
-            android:text="," />
-
-        <Button
             android:id="@+id/btnSpace"
             style="@style/buttonTheme"
             android:layout_weight="4.5"
             android:text="Space" />
 
         <Button
-            android:id="@+id/btnPoint"
-            style="@style/buttonTheme"
-            android:layout_weight="1"
-            android:text="." />
-
-        <Button
             android:id="@+id/btnEnter"
             style="@style/buttonTheme"
-            android:layout_weight="1.5"
+            android:layout_weight="2"
             android:text="Enter" />
     </LinearLayout>
 

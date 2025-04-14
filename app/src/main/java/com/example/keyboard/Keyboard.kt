@@ -115,18 +115,22 @@ class Keyboard : InputMethodService() {
             if (timeSinceLastClick <= doubleClickThreshold && !capsLockFull) {
                 capsLockFull = true
                 capsLockOne = false
+                btnUp.setCompoundDrawablesWithIntrinsicBounds(R.drawable.up_arrow_full, 0, 0, 0)
             }
             else if (capsLockFull) {
                 capsLockFull = false
                 capsLockOne = false
+                btnUp.setCompoundDrawablesWithIntrinsicBounds(R.drawable.up_arrow, 0, 0, 0)
             }
             else if (capsLockOne) {
                 capsLockFull = false
                 capsLockOne = false
+                btnUp.setCompoundDrawablesWithIntrinsicBounds(R.drawable.up_arrow, 0, 0, 0)
             }
             else {
                 capsLockOne = true
                 capsLockFull = false
+                btnUp.setCompoundDrawablesWithIntrinsicBounds(R.drawable.up_arrow_one, 0, 0, 0)
             }
             updateButtonLabels()
             lastClick = currentTime

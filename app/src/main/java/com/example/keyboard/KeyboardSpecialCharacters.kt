@@ -76,6 +76,7 @@ class KeyboardSpecialCharacters(private val parentService: Keyboard) {
             return@setOnClickListener
         }
         //// NEED!!!!!!!!!!!!!!!!!!!!!
+
         keyboarding.btnEnter.setOnClickListener{
             val input = parentService.currentInputConnection
             input?.sendKeyEvent(KeyEvent(KeyEvent.ACTION_DOWN, KeyEvent.KEYCODE_ENTER))

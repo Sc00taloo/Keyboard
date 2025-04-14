@@ -165,9 +165,13 @@
 
         <Button
             android:id="@+id/btnUp"
-            style="@style/buttonTheme"
+            style="@style/buttonSpecialTheme"
             android:layout_weight="1"
-            android:text="UP" />
+            android:drawableStart="@drawable/up_arrow"
+            android:gravity="center"
+            android:paddingStart="2dp"
+            android:paddingEnd="0dp"
+            android:text="" />
 
         <Button
             android:id="@+id/btnя"
@@ -225,9 +229,13 @@
 
         <Button
             android:id="@+id/btnDelete"
-            style="@style/buttonTheme"
+            style="@style/buttonSpecialTheme"
             android:layout_weight="1"
-            android:text="Back" />
+            android:drawableStart="@drawable/delete_icon_for_russian"
+            android:gravity="center"
+            android:paddingStart="3dp"
+            android:paddingEnd="0dp"
+            android:text="" />
     </LinearLayout>
 
     <LinearLayout
@@ -240,15 +248,15 @@
 
         <Button
             android:id="@+id/btnNumbers"
-            style="@style/buttonTheme"
+            style="@style/buttonSpecialTheme"
             android:layout_weight="1"
             android:text="123" />
 
         <Button
             android:id="@+id/btnVoiceInput"
-            style="@style/buttonTheme"
+            style="@style/buttonSpecialTheme"
             android:layout_weight="1"
-            android:text="Micro" />
+            android:text="Микрофон" />
 
         <Button
             android:id="@+id/btnComma"
@@ -258,7 +266,7 @@
 
         <Button
             android:id="@+id/btnSpace"
-            style="@style/buttonTheme"
+            style="@style/buttonSpecialTheme"
             android:layout_weight="4.5"
             android:text="&lt; Русский &gt;" />
 
@@ -270,14 +278,14 @@
 
         <Button
             android:id="@+id/btnEnter"
-            style="@style/buttonTheme"
+            style="@style/buttonSpecialTheme"
             android:layout_weight="1.5"
-            android:text="Enter" />
+            android:text="Ввод" />
     </LinearLayout>
 
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="64dp"
-        android:orientation="horizontal">
-    </LinearLayout>
+<!--    <LinearLayout-->
+<!--        android:layout_width="match_parent"-->
+<!--        android:layout_height="64dp"-->
+<!--        android:orientation="horizontal">-->
+<!--    </LinearLayout>-->
 </LinearLayout>

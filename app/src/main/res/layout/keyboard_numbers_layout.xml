@@ -5,6 +5,19 @@
     android:background="@color/white"
     android:layout_height="wrap_content">
 
+    <HorizontalScrollView
+        android:id="@+id/suggestion_bar"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="#e3ebf9"
+        android:padding="4dp">
+        <LinearLayout
+            android:id="@+id/suggestion_container"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal" />
+    </HorizontalScrollView>
+
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"

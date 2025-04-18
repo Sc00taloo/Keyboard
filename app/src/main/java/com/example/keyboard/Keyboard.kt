@@ -1,6 +1,8 @@
 package com.example.keyboard
 
 import android.inputmethodservice.InputMethodService
+import android.os.Handler
+import android.os.Looper
 import android.util.Log
 import android.view.KeyEvent
 import android.view.MotionEvent
@@ -73,11 +75,19 @@ class Keyboard : InputMethodService() {
                 val input = currentInputConnection
                 val text = button.text.toString()
                 if (text.matches("[a-zA-Zа-яА-Я]".toRegex())) {
-                    val charToAppend = if (capsLockFull || capsLockOne) text.uppercase() else text.lowercase()
+                    val charToAppend =
+                        if (capsLockFull || capsLockOne) text.uppercase() else text.lowercase()
                     currentInput.append(charToAppend)
-                    val currentText = input?.getTextBeforeCursor(100, 0)?.toString() ?: currentInput.toString()
-                    val hasSpaceBefore = currentText.isEmpty() || currentText.takeLastWhile { it != ' ' && it != '\n' } == currentInput.toString()
-                    spellChecker.checkSpelling(rootView, currentInput.toString(), currentLanguage, hasSpaceBefore)
+                    val currentText =
+                        input?.getTextBeforeCursor(100, 0)?.toString() ?: currentInput.toString()
+                    val hasSpaceBefore =
+                        currentText.isEmpty() || currentText.takeLastWhile { it != ' ' && it != '\n' } == currentInput.toString()
+                    spellChecker.checkSpelling(
+                        rootView,
+                        currentInput.toString(),
+                        currentLanguage,
+                        hasSpaceBefore
+                    )
                 }
                 input?.commitText(text, 1)
                 if (capsLockOne && !capsLockFull) {
@@ -91,43 +101,39 @@ class Keyboard : InputMethodService() {
         val btnSpace = rootView.findViewById<Button>(R.id.btnSpace)
         btnSpace?.setOnTouchListener(object : View.OnTouchListener {
             private var initialX = 0f
-            private var isLongPress = false
-            private val swipeThreshold = 50
+            private var isSwiping = false
+            private val swipeThreshold = 50f
 
             override fun onTouch(v: View, event: MotionEvent): Boolean {
                 when (event.action) {
                     MotionEvent.ACTION_DOWN -> {
                         initialX = event.x
-                        v.postDelayed({
-                            isLongPress = true
-                        }, 300)
+                        isSwiping = false
                         return true
                     }
 
                     MotionEvent.ACTION_MOVE -> {
-                        if (isLongPress) {
-                            val deltaX = event.x - initialX
-                            if (abs(deltaX) > swipeThreshold) {
-                                currentLanguage =
-                                    if (currentLanguage == Language.EN) Language.RU else Language.EN
-                                setInputView(if (currentLanguage == Language.EN) enKeyboard?.root else ruKeyboard?.root)
-                                updateSpaceButtonText()
-                                currentInput.clear()
-                                currentInputConnection?.deleteSurroundingText(100, 0)
-                                spellChecker.clearSuggestions(rootView)
-                                isLongPress = false
-                            }
+                        val deltaX = event.x - initialX
+                        if (abs(deltaX) > swipeThreshold) {
+                            isSwiping = true
+                            currentLanguage =
+                                if (currentLanguage == Language.EN) Language.RU else Language.EN
+                            setInputView(if (currentLanguage == Language.EN) enKeyboard?.root else ruKeyboard?.root)
+                            updateSpaceButtonText()
+                            currentInput.clear()
+                            spellChecker?.clearSuggestions(rootView)
+                            return true
                         }
                         return true
                     }
 
                     MotionEvent.ACTION_UP -> {
-                        if (!isLongPress) {
+                        if (!isSwiping) {
                             currentInputConnection?.commitText(" ", 1)
                             currentInput.clear()
-                            spellChecker.clearSuggestions(rootView)
+                            spellChecker?.clearSuggestions(rootView)
                         }
-                        isLongPress = false
+                        isSwiping = false
                         return true
                     }
                 }
@@ -186,30 +192,56 @@ class Keyboard : InputMethodService() {
         }
 
         val btnDelete = rootView.findViewById<Button>(R.id.btnDelete)
-        btnDelete?.setOnClickListener {
-            currentInputConnection?.sendKeyEvent(
-                KeyEvent(
-                    KeyEvent.ACTION_DOWN,
-                    KeyEvent.KEYCODE_DEL
-                )
-            )
-            val currentText = currentInputConnection?.getTextBeforeCursor(100, 0)?.toString() ?: ""
-            val currentWord = currentText.takeLastWhile { it != ' ' && it != '\n' }
-            currentInput.clear()
-            currentInput.append(currentWord)
-            val hasSpaceBefore =
-                currentText.isEmpty() || currentText.takeLastWhile { it != ' ' && it != '\n' } == currentWord
-            Log.d(
-                "Keyboard",
-                "After delete: Word: $currentWord, Current text: $currentText, Has space: $hasSpaceBefore"
-            )
-            if (currentWord.isNotEmpty()) {
-                spellChecker.checkSpelling(rootView, currentWord, currentLanguage, hasSpaceBefore)
-            } else {
-                spellChecker.clearSuggestions(rootView)
-                Log.d("Keyboard", "Skipping checkSpelling: Word is empty")
+        btnDelete?.setOnTouchListener(object : View.OnTouchListener {
+            private var isDeleting = false
+            private var deleteHandler: Handler? = null
+            private lateinit var deleteRunnable: Runnable
+
+            override fun onTouch(v: View?, event: MotionEvent?): Boolean {
+                when (event?.action) {
+                    MotionEvent.ACTION_DOWN -> {
+                        isDeleting = true
+                        deleteHandler = Handler(Looper.getMainLooper())
+                        deleteRunnable = object : Runnable {
+                            override fun run() {
+                                if (isDeleting) {
+                                    deleteCharacter()
+                                    deleteHandler?.postDelayed(this, 200)
+                                }
+                            }
+                        }
+                        deleteHandler?.post(deleteRunnable)
+                        return true
+                    }
+                    MotionEvent.ACTION_UP, MotionEvent.ACTION_CANCEL -> {
+                        isDeleting = false
+                        deleteHandler?.removeCallbacks(deleteRunnable)
+                        return true
+                    }
+                }
+                return false
             }
-        }
+            private fun deleteCharacter() {
+                currentInputConnection?.sendKeyEvent(
+                    KeyEvent(KeyEvent.ACTION_DOWN, KeyEvent.KEYCODE_DEL)
+                )
+                val currentText = currentInputConnection?.getTextBeforeCursor(100, 0)?.toString() ?: ""
+                val currentWord = currentText.takeLastWhile { it != ' ' && it != '\n' }
+                currentInput.clear()
+                currentInput.append(currentWord)
+                val hasSpaceBefore = currentText.isEmpty() || currentText.takeLastWhile { it != ' ' && it != '\n' } == currentWord
+                if (currentWord.isNotEmpty()) {
+                    spellChecker.checkSpelling(
+                        rootView,
+                        currentWord,
+                        currentLanguage,
+                        hasSpaceBefore
+                    )
+                } else {
+                    spellChecker.clearSuggestions(rootView)
+                }
+            }
+        })
     }
 
     private fun updateButtonLabels() {

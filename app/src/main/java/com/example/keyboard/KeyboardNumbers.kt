@@ -1,5 +1,7 @@
 package com.example.keyboard
 
+import android.os.Handler
+import android.os.Looper
 import android.view.KeyEvent
 import android.view.MotionEvent
 import android.view.View
@@ -33,35 +35,32 @@ class KeyboardNumbers(private val parentService: Keyboard) {
 
         keyboarding.btnSpace.setOnTouchListener(object : View.OnTouchListener {
             private var initialX = 0f
-            private var isLongPress = false
-            private val swipeThreshold = 50
+            private var isSwiping = false
+            private val swipeThreshold = 50f
 
             override fun onTouch(v: View, event: MotionEvent): Boolean {
                 when (event.action) {
                     MotionEvent.ACTION_DOWN -> {
                         initialX = event.x
-                        v.postDelayed({
-                            isLongPress = true
-                        }, 300)
+                        isSwiping = false
                         return true
                     }
                     MotionEvent.ACTION_MOVE -> {
-                        if (isLongPress) {
                             val deltaX = event.x - initialX
                             if (abs(deltaX) > swipeThreshold) {
+                                isSwiping = true
                                 val newLanguage = if (parentService.getCurrentLanguage() == Language.EN) Language.RU else Language.EN
                                 parentService.setCurrentLanguage(newLanguage)
                                 parentService.setInputView(parentService.onCreateInputView())
-                                isLongPress = false
+                                return true
                             }
-                        }
                         return true
                     }
                     MotionEvent.ACTION_UP -> {
-                        if (!isLongPress) {
+                        if (!isSwiping) {
                             parentService.currentInputConnection?.commitText(" ", 1)
                         }
-                        isLongPress = false
+                        isSwiping = false
                         return true
                     }
                 }
@@ -80,11 +79,35 @@ class KeyboardNumbers(private val parentService: Keyboard) {
             input?.sendKeyEvent(KeyEvent(KeyEvent.ACTION_DOWN, KeyEvent.KEYCODE_ENTER))
             return@setOnClickListener
         }
-        keyboarding.btnDelete.setOnClickListener{
-            val input = parentService.currentInputConnection
-            input?.sendKeyEvent(KeyEvent(KeyEvent.ACTION_DOWN, KeyEvent.KEYCODE_DEL))
-            return@setOnClickListener
-        }
+        keyboarding.btnDelete.setOnTouchListener(object : View.OnTouchListener {
+            private var isDeleting = false
+            private val handler = Handler(Looper.getMainLooper())
+            private val deleteRunnable = object : Runnable {
+                override fun run() {
+                    if (isDeleting) {
+                        val input = parentService.currentInputConnection
+                        input?.sendKeyEvent(KeyEvent(KeyEvent.ACTION_DOWN, KeyEvent.KEYCODE_DEL))
+                        handler.postDelayed(this, 200)
+                    }
+                }
+            }
+
+            override fun onTouch(v: View?, event: MotionEvent?): Boolean {
+                when (event?.action) {
+                    MotionEvent.ACTION_DOWN -> {
+                        isDeleting = true
+                        handler.post(deleteRunnable)
+                        return true
+                    }
+                    MotionEvent.ACTION_UP, MotionEvent.ACTION_CANCEL -> {
+                        isDeleting = false
+                        handler.removeCallbacks(deleteRunnable)
+                        return true
+                    }
+                }
+                return false
+            }
+        })
         keyboarding.btnBaseKeyboard.setOnClickListener {
             parentService.setInputView(parentService.onCreateInputView())
         }

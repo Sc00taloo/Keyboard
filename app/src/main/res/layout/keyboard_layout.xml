@@ -164,7 +164,7 @@
             android:layout_weight="1.5"
             android:drawableStart="@drawable/up_arrow"
             android:gravity="center"
-            android:paddingStart="13.5dp"
+            android:paddingStart="9dp"
             android:paddingEnd="0dp"
             android:text="" />
 
@@ -216,7 +216,7 @@
             android:layout_weight="1.5"
             android:drawableStart="@drawable/delete_icon"
             android:gravity="center"
-            android:paddingStart="9dp"
+            android:paddingStart="6dp"
             android:paddingEnd="0dp"
             android:text="" />
 

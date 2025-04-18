@@ -182,7 +182,7 @@
             android:layout_weight="1"
             android:drawableStart="@drawable/up_arrow"
             android:gravity="center"
-            android:paddingStart="2dp"
+            android:paddingStart="-1dp"
             android:paddingEnd="0dp"
             android:text="" />
 
@@ -246,7 +246,7 @@
             android:layout_weight="1"
             android:drawableStart="@drawable/delete_icon_for_russian"
             android:gravity="center"
-            android:paddingStart="3dp"
+            android:paddingStart="0dp"
             android:paddingEnd="0dp"
             android:text="" />
     </LinearLayout>

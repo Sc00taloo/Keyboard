@@ -7,14 +7,28 @@ import android.widget.LinearLayout
 import android.widget.TextView
 import com.example.keyboard.Language
 import com.example.keyboard.R
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import java.io.File
 
 class SpellChecker(private val context: Context, private val inputConnection: android.view.inputmethod.InputConnection?, private val onSuggestionSelected: () -> Unit)
 {
     private var hunspellEn: Long = 0
     private var hunspellRu: Long = 0
+    private var isInitialized = false
 
     init {
+        CoroutineScope(Dispatchers.IO).launch {
+            initializeDictionaries()
+            withContext(Dispatchers.Main) {
+                isInitialized = true
+            }
+        }
+    }
+
+    private fun initializeDictionaries() {
         val dictDir = File(context.filesDir, "dictionaries")
         dictDir.mkdirs()
         copyAssetToFile("dictionaries/en_US.dic", File(dictDir, "en_US.dic"))
@@ -22,7 +36,6 @@ class SpellChecker(private val context: Context, private val inputConnection: an
         copyAssetToFile("dictionaries/ru_RU.dic", File(dictDir, "ru_RU.dic"))
         copyAssetToFile("dictionaries/ru_RU.aff", File(dictDir, "ru_RU.aff"))
 
-        // Инициализируем Hunspell
         hunspellEn = initHunspell(
             File(dictDir, "en_US.dic").absolutePath,
             File(dictDir, "en_US.aff").absolutePath
@@ -44,7 +57,6 @@ class SpellChecker(private val context: Context, private val inputConnection: an
     }
 
     private external fun initHunspell(dicPath: String, affPath: String): Long
-    private external fun destroyHunspell(handle: Long)
     private external fun suggest(handle: Long, word: String): Array<String>
     private external fun spell(handle: Long, word: String): Boolean
 
@@ -66,6 +78,10 @@ class SpellChecker(private val context: Context, private val inputConnection: an
     }
 
     fun checkSpelling(rootView: View, text: String, language: Language, hasSpaceBefore: Boolean) {
+        if (!isInitialized) {
+            clearSuggestions(rootView)
+            return
+        }
         if (text.isEmpty()) {
             clearSuggestions(rootView)
             return
@@ -75,16 +91,16 @@ class SpellChecker(private val context: Context, private val inputConnection: an
         Log.d("SpellChecker", "Input: $text, Is correct: $isCorrect, Has space: $hasSpaceBefore")
         if (isCorrect) {
             val suggestions = suggest(hunspellHandle, text)
-                .filter { it.startsWith(text) && it != text && levenshteinDistance(text, it) <= 2}
-                .take(10)
+                .filter { it.startsWith(text) && it != text && levenshteinDistance(text, it) <= 3}
+                .take(7)
             showSuggestions(rootView, suggestions, text, hasSpaceBefore)
         } else {
             val suggestions = suggest(hunspellHandle, text)
                 .filter {
-                    (it.startsWith(text) || levenshteinDistance(text, it) <= 2) &&
+                    (it.startsWith(text) || levenshteinDistance(text, it) <= 3) &&
                             it.length >= text.length - 1
                 }
-                .take(10)
+                .take(7)
             showSuggestions(rootView, suggestions, text, hasSpaceBefore)
         }
     }
@@ -107,7 +123,6 @@ class SpellChecker(private val context: Context, private val inputConnection: an
                     inputConnection?.commitText("$suggestion ", 1)
                     suggestionContainer.removeAllViews()
                     onSuggestionSelected()
-                    Log.d("SpellChecker", "Selected suggestion: $suggestion, Deleted chars: $charsToDelete")
                 }
             }
             suggestionContainer?.addView(textView)
@@ -117,7 +132,6 @@ class SpellChecker(private val context: Context, private val inputConnection: an
     fun clearSuggestions(rootView: View) {
         val suggestionContainer = rootView.findViewById<LinearLayout>(R.id.suggestion_container)
         suggestionContainer?.removeAllViews()
-        Log.d("SpellChecker", "Cleared suggestions")
     }
 
     companion object {

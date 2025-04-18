@@ -206,7 +206,7 @@
             android:layout_weight="1.5"
             android:drawableStart="@drawable/delete_icon"
             android:gravity="center"
-            android:paddingStart="18dp"
+            android:paddingStart="12dp"
             android:paddingEnd="0dp"
             android:text="" />
     </LinearLayout>

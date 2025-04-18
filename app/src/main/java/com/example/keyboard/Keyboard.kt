@@ -17,8 +17,8 @@ class Keyboard : InputMethodService() {
     private var lastClick = 0L
     private val doubleClickThreshold = 500
 
-    private lateinit var enKeyboard: KeyboardLayoutBinding
-    private lateinit var ruKeyboard: KeyboardRuLayoutBinding
+    private var enKeyboard: KeyboardLayoutBinding? = null
+    private var ruKeyboard: KeyboardRuLayoutBinding? = null
     private val currentInput = StringBuilder()
 
     private lateinit var spellChecker: SpellChecker
@@ -39,12 +39,19 @@ class Keyboard : InputMethodService() {
     )
 
     override fun onCreateInputView(): View {
-        enKeyboard = KeyboardLayoutBinding.inflate(layoutInflater)
-        ruKeyboard = KeyboardRuLayoutBinding.inflate(layoutInflater)
-        spellChecker = SpellChecker(this, currentInputConnection) { currentInput.clear() }
-        setupKeyboard(enKeyboard)
-        setupKeyboard(ruKeyboard)
-        return if (currentLanguage == Language.EN) enKeyboard.root else ruKeyboard.root
+        // Кэширую макеты, если они еще не созданы
+        if (enKeyboard == null) {
+            enKeyboard = KeyboardLayoutBinding.inflate(layoutInflater)
+            setupKeyboard(enKeyboard!!)
+        }
+        if (ruKeyboard == null) {
+            ruKeyboard = KeyboardRuLayoutBinding.inflate(layoutInflater)
+            setupKeyboard(ruKeyboard!!)
+        }
+        if (!::spellChecker.isInitialized) {
+            spellChecker = SpellChecker(this, currentInputConnection) { currentInput.clear() }
+        }
+        return if (currentLanguage == Language.EN) enKeyboard!!.root else ruKeyboard!!.root
     }
 
     private fun setupKeyboard(keyboarding: Any) {
@@ -66,21 +73,11 @@ class Keyboard : InputMethodService() {
                 val input = currentInputConnection
                 val text = button.text.toString()
                 if (text.matches("[a-zA-Zа-яА-Я]".toRegex())) {
-                    val charToAppend =
-                        if (capsLockFull || capsLockOne) text.uppercase() else text.lowercase()
+                    val charToAppend = if (capsLockFull || capsLockOne) text.uppercase() else text.lowercase()
                     currentInput.append(charToAppend)
                     val currentText = input?.getTextBeforeCursor(100, 0)?.toString() ?: currentInput.toString()
                     val hasSpaceBefore = currentText.isEmpty() || currentText.takeLastWhile { it != ' ' && it != '\n' } == currentInput.toString()
-                    Log.d(
-                        "Keyboard",
-                        "Input: ${currentInput.toString()}, Current text: $currentText, Has space: $hasSpaceBefore"
-                    )
-                    spellChecker.checkSpelling(
-                        rootView,
-                        currentInput.toString(),
-                        currentLanguage,
-                        hasSpaceBefore
-                    )
+                    spellChecker.checkSpelling(rootView, currentInput.toString(), currentLanguage, hasSpaceBefore)
                 }
                 input?.commitText(text, 1)
                 if (capsLockOne && !capsLockFull) {
@@ -113,7 +110,7 @@ class Keyboard : InputMethodService() {
                             if (abs(deltaX) > swipeThreshold) {
                                 currentLanguage =
                                     if (currentLanguage == Language.EN) Language.RU else Language.EN
-                                setInputView(if (currentLanguage == Language.EN) enKeyboard.root else ruKeyboard.root)
+                                setInputView(if (currentLanguage == Language.EN) enKeyboard?.root else ruKeyboard?.root)
                                 updateSpaceButtonText()
                                 currentInput.clear()
                                 currentInputConnection?.deleteSurroundingText(100, 0)
@@ -220,16 +217,18 @@ class Keyboard : InputMethodService() {
         val currentButtonList = if (currentLanguage == Language.EN) enKeyboardList else ruKeyboardList
 
         for (buttonId in currentButtonList) {
-            val button = currentBinding.root.findViewById<Button>(buttonId)
-            val baseText = button.text.toString().lowercase()
-            button.text = if (capsLockFull || capsLockOne) baseText.uppercase() else baseText
+            val button = currentBinding?.root?.findViewById<Button>(buttonId)
+            val baseText = button?.text.toString().lowercase()
+            if (button != null) {
+                button.text = if (capsLockFull || capsLockOne) baseText.uppercase() else baseText
+            }
         }
     }
 
     private fun updateSpaceButtonText() {
         val spaceText = if (currentLanguage == Language.EN) "< English >" else "< Русский >"
-        enKeyboard.btnSpace.text = spaceText
-        ruKeyboard.btnSpace.text = spaceText
+        enKeyboard?.btnSpace?.text ?: spaceText
+        ruKeyboard?.btnSpace?.text ?: spaceText
     }
 
     private fun updateUpButtonIcon(button: Button?) {

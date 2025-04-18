@@ -15,7 +15,6 @@ class SpellChecker(private val context: Context, private val inputConnection: an
     private var hunspellRu: Long = 0
 
     init {
-        // Копируем словари из assets в файлы приложения
         val dictDir = File(context.filesDir, "dictionaries")
         dictDir.mkdirs()
         copyAssetToFile("dictionaries/en_US.dic", File(dictDir, "en_US.dic"))
@@ -71,27 +70,21 @@ class SpellChecker(private val context: Context, private val inputConnection: an
             clearSuggestions(rootView)
             return
         }
-
-        // Выбираем Hunspell в зависимости от языка
         val hunspellHandle = if (language == Language.EN) hunspellEn else hunspellRu
-        // Проверяем, правильное ли слово
         val isCorrect = spell(hunspellHandle, text)
         Log.d("SpellChecker", "Input: $text, Is correct: $isCorrect, Has space: $hasSpaceBefore")
-
         if (isCorrect) {
-            // Если слово правильное, показываем только слова, начинающиеся с введенного текста
             val suggestions = suggest(hunspellHandle, text)
-                .filter { it.startsWith(text) && it != text && levenshteinDistance(text, it) <= 2 }
-                .take(3)
+                .filter { it.startsWith(text) && it != text && levenshteinDistance(text, it) <= 2}
+                .take(10)
             showSuggestions(rootView, suggestions, text, hasSpaceBefore)
         } else {
-            // Если слово неправильное, фильтруем по префиксу, длине и расстоянию Левенштейна
             val suggestions = suggest(hunspellHandle, text)
                 .filter {
                     (it.startsWith(text) || levenshteinDistance(text, it) <= 2) &&
                             it.length >= text.length - 1
                 }
-                .take(3)
+                .take(10)
             showSuggestions(rootView, suggestions, text, hasSpaceBefore)
         }
     }
@@ -109,10 +102,8 @@ class SpellChecker(private val context: Context, private val inputConnection: an
                 textSize = 16f
                 setBackgroundResource(android.R.drawable.btn_default_small)
                 setOnClickListener {
-                    // Удаляем текущее слово и пробел перед ним, если он есть
                     val charsToDelete = if (hasSpaceBefore && currentText.isNotEmpty()) currentText.length + 1 else currentText.length
                     inputConnection?.deleteSurroundingText(charsToDelete, 0)
-                    // Вставляем предложение и пробел
                     inputConnection?.commitText("$suggestion ", 1)
                     suggestionContainer.removeAllViews()
                     onSuggestionSelected()
@@ -127,11 +118,6 @@ class SpellChecker(private val context: Context, private val inputConnection: an
         val suggestionContainer = rootView.findViewById<LinearLayout>(R.id.suggestion_container)
         suggestionContainer?.removeAllViews()
         Log.d("SpellChecker", "Cleared suggestions")
-    }
-
-    fun destroy() {
-        if (hunspellEn != 0L) destroyHunspell(hunspellEn)
-        if (hunspellRu != 0L) destroyHunspell(hunspellRu)
     }
 
     companion object {

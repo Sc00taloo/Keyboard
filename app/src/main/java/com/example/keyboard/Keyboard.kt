@@ -69,12 +69,8 @@ class Keyboard : InputMethodService() {
                     val charToAppend =
                         if (capsLockFull || capsLockOne) text.uppercase() else text.lowercase()
                     currentInput.append(charToAppend)
-                    // Получаем текущий текст
-                    val currentText =
-                        input?.getTextBeforeCursor(100, 0)?.toString() ?: currentInput.toString()
-                    // Проверяем, является ли текущий текст новым словом
-                    val hasSpaceBefore =
-                        currentText.isEmpty() || currentText.takeLastWhile { it != ' ' && it != '\n' } == currentInput.toString()
+                    val currentText = input?.getTextBeforeCursor(100, 0)?.toString() ?: currentInput.toString()
+                    val hasSpaceBefore = currentText.isEmpty() || currentText.takeLastWhile { it != ' ' && it != '\n' } == currentInput.toString()
                     Log.d(
                         "Keyboard",
                         "Input: ${currentInput.toString()}, Current text: $currentText, Has space: $hasSpaceBefore"

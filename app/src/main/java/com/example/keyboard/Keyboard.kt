@@ -1,5 +1,7 @@
 package com.example.keyboard
 
+import android.Manifest
+import android.content.pm.PackageManager
 import android.inputmethodservice.InputMethodService
 import android.os.Handler
 import android.os.Looper
@@ -8,9 +10,15 @@ import android.view.KeyEvent
 import android.view.MotionEvent
 import android.view.View
 import android.widget.Button
+import android.widget.ImageButton
+import android.widget.Toast
+import androidx.core.app.ActivityCompat
+import androidx.core.content.ContextCompat
 import com.example.keyboard.databinding.KeyboardLayoutBinding
 import com.example.keyboard.databinding.KeyboardRuLayoutBinding
 import com.example.keyboard.spellChecker.SpellChecker
+import com.example.keyboard.voice.Microphone
+import com.example.keyboard.voice.requestMicrophone
 import kotlin.math.abs
 
 class Keyboard : InputMethodService() {
@@ -27,6 +35,9 @@ class Keyboard : InputMethodService() {
     private var currentLanguage = Language.EN
     val keyboardNumbers = KeyboardNumbers(this)
 
+    private lateinit var microphone: Microphone
+    private lateinit var requestMicrophone: requestMicrophone
+
     private val keyboardSpecialCharacters = KeyboardSpecialCharacters(this)
 
     private val enKeyboardList = arrayOf(
@@ -39,6 +50,18 @@ class Keyboard : InputMethodService() {
         R.id.btnф, R.id.btnы, R.id.btnв, R.id.btnа, R.id.btnп, R.id.btnр, R.id.btnо, R.id.btnл, R.id.btnд, R.id.btnж, R.id.btnэ,
         R.id.btnя, R.id.btnч, R.id.btnс, R.id.btnм, R.id.btnи, R.id.btnт, R.id.btnь, R.id.btnб, R.id.btnю, R.id.btnComma, R.id.btnPoint
     )
+
+    override fun onCreate() {
+        super.onCreate()
+        microphone = Microphone(this, currentInputConnection) { text ->
+            val rootView = if (currentLanguage == Language.EN) enKeyboard?.root else ruKeyboard?.root
+            rootView?.let {
+                spellChecker.checkSpelling(it, text, currentLanguage, true)
+            }
+        }
+        requestMicrophone = requestMicrophone(this)
+    }
+
 
     override fun onCreateInputView(): View {
         // Кэширую макеты, если они еще не созданы
@@ -141,26 +164,26 @@ class Keyboard : InputMethodService() {
             }
         })
 
-        val btnUp = rootView.findViewById<Button>(R.id.btnUp)
+        val btnUp = rootView.findViewById<ImageButton>(R.id.btnUp)
         btnUp?.setOnClickListener {
             val currentTime = System.currentTimeMillis()
             val timeSinceLastClick = currentTime - lastClick
             if (timeSinceLastClick <= doubleClickThreshold && !capsLockFull) {
                 capsLockFull = true
                 capsLockOne = false
-                btnUp.setCompoundDrawablesWithIntrinsicBounds(R.drawable.up_arrow_full, 0, 0, 0)
+                btnUp.setImageResource(R.drawable.up_arrow_full)
             } else if (capsLockFull) {
                 capsLockFull = false
                 capsLockOne = false
-                btnUp.setCompoundDrawablesWithIntrinsicBounds(R.drawable.up_arrow, 0, 0, 0)
+                btnUp.setImageResource(R.drawable.up_arrow)
             } else if (capsLockOne) {
                 capsLockFull = false
                 capsLockOne = false
-                btnUp.setCompoundDrawablesWithIntrinsicBounds(R.drawable.up_arrow, 0, 0, 0)
+                btnUp.setImageResource(R.drawable.up_arrow)
             } else {
                 capsLockOne = true
                 capsLockFull = false
-                btnUp.setCompoundDrawablesWithIntrinsicBounds(R.drawable.up_arrow_one, 0, 0, 0)
+                btnUp.setImageResource(R.drawable.up_arrow_one)
             }
             updateButtonLabels()
             lastClick = currentTime
@@ -171,13 +194,24 @@ class Keyboard : InputMethodService() {
             setInputView(keyboardNumbers.onCreateInputView())
         }
 
-        //// NEED!!!!!!!!!!!!!!!!!!!!!
-//        keyboarding.btnVoiceInput.setOnClickListener{
-//            val input = currentInputConnection
-//            input?.sendKeyEvent(KeyEvent(KeyEvent.ACTION_DOWN, KeyEvent.KEYCODE_SPACE))
-//            return@setOnClickListener
-//        }
-        //// NEED!!!!!!!!!!!!!!!!!!!!!
+        // NEED!!!!!!!!!!!!!!!!!!!!!
+        val btnVoiceInput = rootView.findViewById<ImageButton>(R.id.btnVoiceInput)
+        btnVoiceInput?.apply {
+            isClickable = true
+            isFocusable = true
+            setOnClickListener {
+                Log.d("Keyboard", "btnVoiceInput clicked")
+                if (ContextCompat.checkSelfPermission(this@Keyboard, Manifest.permission.RECORD_AUDIO)
+                    == PackageManager.PERMISSION_GRANTED) {
+                    Log.d("Keyboard", "Permission granted, starting voice input")
+                    microphone.startVoiceInput(if (currentLanguage == Language.EN) "en-US" else "ru-RU")
+                } else {
+                    Log.d("Keyboard", "Permission not granted, requesting permission")
+                    requestMicrophone.requestMicrophonePermission()
+                }
+            }
+        } ?: Log.e("Keyboard", "btnVoiceInput not found in layout")
+        // NEED!!!!!!!!!!!!!!!!!!!!!
 
         val btnEnter = rootView.findViewById<Button>(R.id.btnEnter)
         btnEnter?.setOnClickListener {
@@ -191,7 +225,7 @@ class Keyboard : InputMethodService() {
             spellChecker.clearSuggestions(rootView)
         }
 
-        val btnDelete = rootView.findViewById<Button>(R.id.btnDelete)
+        val btnDelete = rootView.findViewById<ImageButton>(R.id.btnDelete)
         btnDelete?.setOnTouchListener(object : View.OnTouchListener {
             private var isDeleting = false
             private var deleteHandler: Handler? = null
@@ -242,6 +276,11 @@ class Keyboard : InputMethodService() {
                 }
             }
         })
+    }
+
+    override fun onDestroy() {
+        microphone.destroy()
+        super.onDestroy()
     }
 
     private fun updateButtonLabels() {

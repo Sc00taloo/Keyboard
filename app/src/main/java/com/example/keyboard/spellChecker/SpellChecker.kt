@@ -91,14 +91,16 @@ class SpellChecker(private val context: Context, private val inputConnection: an
         Log.d("SpellChecker", "Input: $text, Is correct: $isCorrect, Has space: $hasSpaceBefore")
         if (isCorrect) {
             val suggestions = suggest(hunspellHandle, text)
-                .filter { it.startsWith(text) && it != text && levenshteinDistance(text, it) <= 3}
+                .take(10)
+                .filter { it.startsWith(text) && it != text && levenshteinDistance(text, it) <= 2
+                }
                 .take(7)
             showSuggestions(rootView, suggestions, text, hasSpaceBefore)
         } else {
             val suggestions = suggest(hunspellHandle, text)
-                .filter {
-                    (it.startsWith(text) || levenshteinDistance(text, it) <= 3) &&
-                            it.length >= text.length - 1
+                .take(30)
+                .filter { (it.startsWith(text) || levenshteinDistance(text, it) <= 3) &&
+                        (it.length >= text.length - 1 && it.length >= 3)
                 }
                 .take(7)
             showSuggestions(rootView, suggestions, text, hasSpaceBefore)

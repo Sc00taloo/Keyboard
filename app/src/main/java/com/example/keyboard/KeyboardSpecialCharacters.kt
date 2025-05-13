@@ -6,6 +6,7 @@ import android.view.KeyEvent
 import android.view.MotionEvent
 import android.view.View
 import android.widget.Button
+import android.widget.ImageButton
 import com.example.keyboard.databinding.KeyboardSpecialCharactersLayoutBinding
 import kotlin.math.abs
 
@@ -81,7 +82,8 @@ class KeyboardSpecialCharacters(private val parentService: Keyboard) {
             input?.sendKeyEvent(KeyEvent(KeyEvent.ACTION_DOWN, KeyEvent.KEYCODE_ENTER))
             return@setOnClickListener
         }
-        keyboarding.btnDelete.setOnTouchListener(object : View.OnTouchListener {
+        val delete = keyboarding.root.findViewById<ImageButton>(R.id.btnDelete)
+        delete.setOnTouchListener(object : View.OnTouchListener {
             private var isDeleting = false
             private val handler = Handler(Looper.getMainLooper())
             private val deleteRunnable = object : Runnable {

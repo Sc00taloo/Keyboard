@@ -7,15 +7,19 @@ import android.os.Handler
 import android.os.Looper
 import android.util.Log
 import android.view.KeyEvent
+import android.view.LayoutInflater
 import android.view.MotionEvent
 import android.view.View
+import android.view.ViewGroup
 import android.widget.Button
 import android.widget.ImageButton
-import android.widget.Toast
-import androidx.core.app.ActivityCompat
+import android.widget.LinearLayout
+import android.widget.PopupWindow
 import androidx.core.content.ContextCompat
+import com.example.keyboard.animation.voiceInputAnimation
 import com.example.keyboard.databinding.KeyboardLayoutBinding
 import com.example.keyboard.databinding.KeyboardRuLayoutBinding
+import com.example.keyboard.sentenceClassifier.SentenceClassifier
 import com.example.keyboard.spellChecker.SpellChecker
 import com.example.keyboard.voice.Microphone
 import com.example.keyboard.voice.requestMicrophone
@@ -38,6 +42,8 @@ class Keyboard : InputMethodService() {
     private lateinit var microphone: Microphone
     private lateinit var requestMicrophone: requestMicrophone
 
+    private lateinit var voiceInputAnimation: voiceInputAnimation
+
     private val keyboardSpecialCharacters = KeyboardSpecialCharacters(this)
 
     private val enKeyboardList = arrayOf(
@@ -53,17 +59,63 @@ class Keyboard : InputMethodService() {
 
     override fun onCreate() {
         super.onCreate()
-        microphone = Microphone(this, currentInputConnection) { text ->
-            val rootView = if (currentLanguage == Language.EN) enKeyboard?.root else ruKeyboard?.root
-            rootView?.let {
-                spellChecker.checkSpelling(it, text, currentLanguage, true)
-            }
+        try {
+            Log.d("Keyboard", "Starting onCreate")
+            val classifier = SentenceClassifier(this)
+            microphone = Microphone(
+                context = this,
+                inputConnection = currentInputConnection,
+                onTextRecognized = { text ->
+                    Log.d("Keyboard", "Text recognized: $text")
+                    val rootView = if (currentLanguage == Language.EN) enKeyboard?.root else ruKeyboard?.root
+                    rootView?.let {
+                        Log.d("Keyboard", "Showing voice input field")
+                        voiceInputAnimation.showVoiceInputField(it, currentInputConnection)
+                        voiceInputAnimation.setRecognizedText(text)
+                        val editText = voiceInputAnimation.voiceInputBinding?.voiceInputEditText
+                        editText?.setOnTouchListener { view, event ->
+                            if (event.action == MotionEvent.ACTION_DOWN) {
+                                val layout = editText.layout ?: return@setOnTouchListener false
+                                val x = event.x
+                                val y = event.y
+                                val line = layout.getLineForVertical(y.toInt())
+                                val offset = layout.getOffsetForHorizontal(line, x)
+                                val textContent = editText.text?.toString() ?: return@setOnTouchListener false
+                                if (offset in textContent.indices) {
+                                    val char = textContent[offset]
+                                    Log.d("Touch", "Touched char: '$char' (${char.code}) at offset $offset")
+                                    if (char == ' ' || char in listOf(',', '.', '!', '?')) {
+                                        showPunctuationPopup(view) { punctuation ->
+                                            editText.text.replace(offset, offset + 1, punctuation)
+                                        }
+                                        return@setOnTouchListener true
+                                    }
+                                }
+                            }
+                            false
+                        }
+                        val lastWord = text.trim().split(" ").lastOrNull() ?: text
+                        spellChecker.checkSpelling(it, lastWord, currentLanguage, true)
+                    } ?: Log.e("Keyboard", "Root view is null for language: $currentLanguage")
+                },
+                classifier = classifier
+            )
+            requestMicrophone = requestMicrophone(this)
+            voiceInputAnimation = voiceInputAnimation(this, currentInputConnection)
+            Log.d("Keyboard", "Microphone and animations initialized")
+
+            // Инициализация клавиатур
+            enKeyboard?.let { setupKeyboard(it) }
+            ruKeyboard?.let { setupKeyboard(it) }
+        } catch (e: Exception) {
+            Log.e("Keyboard", "Failed to initialize keyboard components: ${e.message}", e)
         }
-        requestMicrophone = requestMicrophone(this)
     }
 
 
     override fun onCreateInputView(): View {
+        val container = ViewGroup.inflate(this, R.layout.container_layout, null) as ViewGroup
+        container.removeAllViews()
         // Кэширую макеты, если они еще не созданы
         if (enKeyboard == null) {
             enKeyboard = KeyboardLayoutBinding.inflate(layoutInflater)
@@ -76,7 +128,14 @@ class Keyboard : InputMethodService() {
         if (!::spellChecker.isInitialized) {
             spellChecker = SpellChecker(this, currentInputConnection) { currentInput.clear() }
         }
-        return if (currentLanguage == Language.EN) enKeyboard!!.root else ruKeyboard!!.root
+        enKeyboard?.root?.let { if (it.parent != null) (it.parent as ViewGroup).removeView(it) }
+        ruKeyboard?.root?.let { if (it.parent != null) (it.parent as ViewGroup).removeView(it) }
+
+        val activeKeyboard = if (currentLanguage == Language.EN) enKeyboard else ruKeyboard
+        container.addView(activeKeyboard!!.root)
+        Log.d("Keyboard", "Added ${if (currentLanguage == Language.EN) "English" else "Russian"} keyboard to container")
+
+        return container
     }
 
     private fun setupKeyboard(keyboarding: Any) {
@@ -141,10 +200,10 @@ class Keyboard : InputMethodService() {
                             isSwiping = true
                             currentLanguage =
                                 if (currentLanguage == Language.EN) Language.RU else Language.EN
-                            setInputView(if (currentLanguage == Language.EN) enKeyboard?.root else ruKeyboard?.root)
+                            updateInputView()
                             updateSpaceButtonText()
                             currentInput.clear()
-                            spellChecker?.clearSuggestions(rootView)
+                            spellChecker.clearSuggestions(rootView)
                             return true
                         }
                         return true
@@ -199,18 +258,34 @@ class Keyboard : InputMethodService() {
         btnVoiceInput?.apply {
             isClickable = true
             isFocusable = true
+            isEnabled = true
+            Log.d("Keyboard", "btnVoiceInput found for ${if (keyboarding is KeyboardLayoutBinding) "EN" else "RU"}")
             setOnClickListener {
-                Log.d("Keyboard", "btnVoiceInput clicked")
-                if (ContextCompat.checkSelfPermission(this@Keyboard, Manifest.permission.RECORD_AUDIO)
-                    == PackageManager.PERMISSION_GRANTED) {
-                    Log.d("Keyboard", "Permission granted, starting voice input")
-                    microphone.startVoiceInput(if (currentLanguage == Language.EN) "en-US" else "ru-RU")
-                } else {
-                    Log.d("Keyboard", "Permission not granted, requesting permission")
-                    requestMicrophone.requestMicrophonePermission()
+                Log.d("Keyboard", "btnVoiceInput clicked, language: ${if (currentLanguage == Language.EN) "en-US" else "ru-RU"}")
+                Log.d("Keyboard", "CurrentInputConnection is ${if (currentInputConnection == null) "null" else "valid"}")
+                Log.d("Keyboard", "Parent is ${if (rootView.parent != null) "valid" else "null"}")
+                try {
+                    if (ContextCompat.checkSelfPermission(this@Keyboard, Manifest.permission.RECORD_AUDIO) == PackageManager.PERMISSION_GRANTED) {
+                        if (rootView.parent != null) {
+                            Log.d("Keyboard", "Permission granted, starting voice input")
+                            voiceInputAnimation.showVoiceInputField(rootView.parent as ViewGroup, currentInputConnection)
+                            microphone.startVoiceInput(if (currentLanguage == Language.EN) "en-US" else "ru-RU")
+                        } else {
+                            Log.e("Keyboard", "Parent is null, cannot show voice input field")
+                        }
+                    } else {
+                        Log.d("Keyboard", "Permission not granted, requesting permission")
+                        requestMicrophone.requestMicrophonePermission()
+                    }
+                } catch (e: Exception) {
+                    Log.e("Keyboard", "Error in btnVoiceInput click: ${e.message}", e)
                 }
             }
-        } ?: Log.e("Keyboard", "btnVoiceInput not found in layout")
+            setOnTouchListener { _, event ->
+                Log.d("Keyboard", "btnVoiceInput touched: ${event.action}")
+                false
+            }
+        } ?: Log.e("Keyboard", "btnVoiceInput not found in layout for ${if (keyboarding is KeyboardLayoutBinding) "EN" else "RU"}")
         // NEED!!!!!!!!!!!!!!!!!!!!!
 
         val btnEnter = rootView.findViewById<Button>(R.id.btnEnter)
@@ -280,6 +355,9 @@ class Keyboard : InputMethodService() {
 
     override fun onDestroy() {
         microphone.destroy()
+        if (::spellChecker.isInitialized) {
+            spellChecker.destroy()
+        }
         super.onDestroy()
     }
 
@@ -318,19 +396,42 @@ class Keyboard : InputMethodService() {
         currentLanguage = language
         updateSpaceButtonText()
     }
+
+    private fun updateInputView() {
+        val container = ViewGroup.inflate(this, R.layout.container_layout, null) as ViewGroup
+        container.removeAllViews()
+
+        enKeyboard?.root?.let { if (it.parent != null) (it.parent as ViewGroup).removeView(it) }
+        ruKeyboard?.root?.let { if (it.parent != null) (it.parent as ViewGroup).removeView(it) }
+
+        val activeKeyboard = if (currentLanguage == Language.EN) enKeyboard else ruKeyboard
+        container.addView(activeKeyboard!!.root)
+        Log.d("Keyboard", "Updated input view with ${if (currentLanguage == Language.EN) "English" else "Russian"} keyboard")
+
+        // Обновляем InputConnection для VoiceInputManager
+        voiceInputAnimation.updateInputConnection(currentInputConnection)
+        setInputView(container)
+    }
+
+    private fun showPunctuationPopup(anchor: View, onSelect: (String) -> Unit) {
+        val popupView = LayoutInflater.from(this).inflate(R.layout.punctuation_popup_layout, null)
+        val popupWindow = PopupWindow(popupView, ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT, true)
+        val punctuationList = listOf(".", ",", "!", "?", ";", ":")
+        val container = popupView.findViewById<LinearLayout>(R.id.popupContainer)
+        container.removeAllViews()
+
+        for (symbol in punctuationList) {
+            val button = Button(this).apply {
+                text = symbol
+                textSize = 18f
+                setOnClickListener {
+                    onSelect(symbol)
+                    popupWindow.dismiss()
+                }
+            }
+            container.addView(button)
+        }
+        popupWindow.showAsDropDown(anchor)
+    }
+
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

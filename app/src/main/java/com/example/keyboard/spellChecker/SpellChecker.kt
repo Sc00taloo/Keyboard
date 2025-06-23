@@ -9,6 +9,9 @@ import com.example.keyboard.Language
 import com.example.keyboard.R
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.cancel
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import java.io.File
@@ -18,6 +21,12 @@ class SpellChecker(private val context: Context, private val inputConnection: an
     private var hunspellEn: Long = 0
     private var hunspellRu: Long = 0
     private var isInitialized = false
+
+    private var lastInput: String? = null
+    private var lastLanguage: Language? = null
+    private val scope = CoroutineScope(Dispatchers.Default)
+    private var suggestionJob: Job? = null
+    private val suggestionCache = mutableMapOf<String, List<String>>()
 
     init {
         CoroutineScope(Dispatchers.IO).launch {
@@ -61,6 +70,7 @@ class SpellChecker(private val context: Context, private val inputConnection: an
     private external fun spell(handle: Long, word: String): Boolean
 
     private fun levenshteinDistance(s1: String, s2: String): Int {
+        if (s1.length > 10 || s2.length > 10) return Int.MAX_VALUE
         val dp = Array(s1.length + 1) { IntArray(s2.length + 1) }
         for (i in 0..s1.length) dp[i][0] = i
         for (j in 0..s2.length) dp[0][j] = j
@@ -78,32 +88,53 @@ class SpellChecker(private val context: Context, private val inputConnection: an
     }
 
     fun checkSpelling(rootView: View, text: String, language: Language, hasSpaceBefore: Boolean) {
-        if (!isInitialized) {
+        if (!isInitialized || text.isEmpty()) {
             clearSuggestions(rootView)
             return
         }
-        if (text.isEmpty()) {
-            clearSuggestions(rootView)
-            return
+
+        // Проверяем только последнее слово для оптимизации
+        val lastWord = text.trim().split(" ").lastOrNull() ?: return
+        if (lastWord == lastInput && language == lastLanguage) {
+            return // Пропускаем, если ввод не изменился
         }
-        val hunspellHandle = if (language == Language.EN) hunspellEn else hunspellRu
-        val isCorrect = spell(hunspellHandle, text)
-        Log.d("SpellChecker", "Input: $text, Is correct: $isCorrect, Has space: $hasSpaceBefore")
-        if (isCorrect) {
-            val suggestions = suggest(hunspellHandle, text)
-                .take(10)
-                .filter { it.startsWith(text) && it != text && levenshteinDistance(text, it) <= 2
+        lastInput = lastWord
+        lastLanguage = language
+
+        // Отменяем предыдущую задачу
+        suggestionJob?.cancel()
+        suggestionJob = scope.launch {
+            try {
+                val hunspellHandle = if (language == Language.EN) hunspellEn else hunspellRu
+                val cacheKey = "$lastWord:$language"
+                val suggestions = suggestionCache[cacheKey] ?: run {
+                    val isCorrect = spell(hunspellHandle, lastWord)
+                    Log.d("SpellChecker", "Input: $lastWord, Is correct: $isCorrect, Has space: $hasSpaceBefore")
+                    val rawSuggestions = suggest(hunspellHandle, lastWord).take(30)
+                    val filteredSuggestions = if (isCorrect) {
+                        rawSuggestions
+                            .filter { it.startsWith(lastWord) && it != lastWord && levenshteinDistance(lastWord, it) <= 2 }
+                            .take(7)
+                    } else {
+                        rawSuggestions
+                            .filter { (it.startsWith(lastWord) || levenshteinDistance(lastWord, it) <= 3) &&
+                                    (it.length >= lastWord.length - 1 && it.length >= 3) }
+                            .take(7)
+                    }
+                    suggestionCache[cacheKey] = filteredSuggestions
+                    filteredSuggestions
                 }
-                .take(7)
-            showSuggestions(rootView, suggestions, text, hasSpaceBefore)
-        } else {
-            val suggestions = suggest(hunspellHandle, text)
-                .take(30)
-                .filter { (it.startsWith(text) || levenshteinDistance(text, it) <= 3) &&
-                        (it.length >= text.length - 1 && it.length >= 3)
+
+                withContext(Dispatchers.Main) {
+                    delay(100)
+                    showSuggestions(rootView, suggestions, text, hasSpaceBefore)
                 }
-                .take(7)
-            showSuggestions(rootView, suggestions, text, hasSpaceBefore)
+            } catch (e: Exception) {
+                Log.e("SpellChecker", "Failed to process suggestions: ${e.message}")
+                withContext(Dispatchers.Main) {
+                    clearSuggestions(rootView)
+                }
+            }
         }
     }
 
@@ -112,28 +143,44 @@ class SpellChecker(private val context: Context, private val inputConnection: an
         suggestionContainer?.removeAllViews()
         Log.d("SpellChecker", "Showing suggestions: $suggestions")
 
+        val textViewPool = mutableListOf<TextView>()
+        for (i in 0 until suggestionContainer.childCount) {
+            val view = suggestionContainer.getChildAt(i)
+            if (view is TextView) textViewPool.add(view)
+        }
+
         for (suggestion in suggestions) {
-            val textView = TextView(context).apply {
-                text = suggestion
+            val textView = textViewPool.firstOrNull() ?: TextView(context).apply {
                 setPadding(16, 8, 16, 8)
                 setTextColor(0xFF000000.toInt())
                 textSize = 16f
                 setBackgroundResource(android.R.drawable.btn_default_small)
-                setOnClickListener {
+            }.also { textViewPool.remove(it) }
+
+            textView.text = suggestion
+            textView.setOnClickListener {
+                try {
                     val charsToDelete = if (hasSpaceBefore && currentText.isNotEmpty()) currentText.length + 1 else currentText.length
                     inputConnection?.deleteSurroundingText(charsToDelete, 0)
                     inputConnection?.commitText("$suggestion ", 1)
                     suggestionContainer.removeAllViews()
                     onSuggestionSelected()
+                } catch (e: Exception) {
+                    Log.e("SpellChecker", "Failed to commit suggestion: ${e.message}")
                 }
             }
-            suggestionContainer?.addView(textView)
+            suggestionContainer.addView(textView)
         }
     }
 
     fun clearSuggestions(rootView: View) {
         val suggestionContainer = rootView.findViewById<LinearLayout>(R.id.suggestion_container)
         suggestionContainer?.removeAllViews()
+    }
+
+    fun destroy() {
+        scope.cancel()
+        suggestionCache.clear()
     }
 
     companion object {

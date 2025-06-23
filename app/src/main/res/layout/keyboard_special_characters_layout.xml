@@ -5,6 +5,19 @@
     android:background="@color/white"
     android:layout_height="wrap_content">
 
+    <HorizontalScrollView
+        android:id="@+id/suggestion_bar"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="#e3ebf9"
+        android:padding="4dp">
+        <LinearLayout
+            android:id="@+id/suggestion_container"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal" />
+    </HorizontalScrollView>
+
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -187,15 +200,13 @@
             android:layout_weight="1"
             android:text="'" />
 
-        <Button
+        <ImageButton
             android:id="@+id/btnDelete"
             style="@style/buttonSpecialTheme"
             android:layout_weight="1.5"
-            android:drawableStart="@drawable/delete_icon"
-            android:gravity="center"
-            android:paddingStart="18dp"
-            android:paddingEnd="0dp"
-            android:text="" />
+            android:src="@drawable/delete_icon"
+            android:scaleType="centerInside"
+            android:contentDescription="delete" />
     </LinearLayout>
 
     <LinearLayout
@@ -212,11 +223,15 @@
             android:layout_weight="1"
             android:text="ABC" />
 
-        <Button
+        <ImageButton
             android:id="@+id/btnVoiceInput"
             style="@style/buttonSpecialTheme"
+            android:layout_height="48dp"
             android:layout_weight="1"
-            android:text="Micro" />
+            android:contentDescription="Microphone"
+            android:scaleType="centerInside"
+            android:padding="8dp"
+            android:src="@drawable/microphone_black_shape" />
 
         <Button
             android:id="@+id/btnSpace"

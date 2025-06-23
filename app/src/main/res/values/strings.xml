@@ -10,4 +10,7 @@
     <string name="currency_swap">₽</string>
     <string name="currency_swapEN">$</string>
     <string name="quote_symbol">\"</string>
+
+    <string name="speak_hint">Говорите...</string>
+    <string name="not_recognized">Не распознано</string>
 </resources>

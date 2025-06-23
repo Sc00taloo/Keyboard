@@ -5,6 +5,19 @@
     android:background="@color/white"
     android:layout_height="wrap_content">
 
+    <HorizontalScrollView
+        android:id="@+id/suggestion_bar"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="#e3ebf9"
+        android:padding="4dp">
+        <LinearLayout
+            android:id="@+id/suggestion_container"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal" />
+    </HorizontalScrollView>
+
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -145,15 +158,13 @@
         android:orientation="horizontal"
         android:weightSum="10">
 
-        <Button
+        <ImageButton
             android:id="@+id/btnUp"
             style="@style/buttonSpecialTheme"
             android:layout_weight="1.5"
-            android:drawableStart="@drawable/up_arrow"
-            android:gravity="center"
-            android:paddingStart="13.5dp"
-            android:paddingEnd="0dp"
-            android:text="" />
+            android:src="@drawable/up_arrow"
+            android:scaleType="centerInside"
+            android:contentDescription="delete" />
 
         <Button
             android:id="@+id/btnz"
@@ -197,15 +208,13 @@
             android:layout_weight="1"
             android:text="m" />
 
-        <Button
+        <ImageButton
             android:id="@+id/btnDelete"
             style="@style/buttonSpecialTheme"
             android:layout_weight="1.5"
-            android:drawableStart="@drawable/delete_icon"
-            android:gravity="center"
-            android:paddingStart="9dp"
-            android:paddingEnd="0dp"
-            android:text="" />
+            android:src="@drawable/delete_icon"
+            android:scaleType="centerInside"
+            android:contentDescription="delete" />
 
     </LinearLayout>
 
@@ -223,11 +232,15 @@
             android:layout_weight="1"
             android:text="123" />
 
-        <Button
+        <ImageButton
             android:id="@+id/btnVoiceInput"
             style="@style/buttonSpecialTheme"
+            android:layout_height="48dp"
             android:layout_weight="1"
-            android:text="Micro" />
+            android:contentDescription="Microphone"
+            android:scaleType="centerInside"
+            android:padding="5dp"
+            android:src="@drawable/microphone_black_shape" />
 
         <Button
             android:id="@+id/btnComma"

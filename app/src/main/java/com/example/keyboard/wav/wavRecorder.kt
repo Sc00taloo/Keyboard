@@ -51,7 +51,6 @@ class wavRecorder(
         Log.d("WavRecorder", "Запись началась, буфер: $bufferSize")
 
         while (isRecording) {
-            // Минимальная длительность записи 4 секунды
             if (System.currentTimeMillis() - startTime < 4000) {
                 Thread.sleep(100)
                 continue
@@ -69,10 +68,9 @@ class wavRecorder(
                     val window = silenceBuffer.take(silenceWindowSize).toShortArray()
                     silenceBuffer.subList(0, silenceWindowSize).clear()
                     val energy = computeEnergy(window)
-                    Log.d("WavRecorder", "Энергия окна: $energy")
                     if (energy < silenceThreshold) {
                         silenceCounter++
-                        Log.d("WavRecorder", "Тишина обнаружена, счётчик: $silenceCounter")
+                        Log.d("WavRecorder", "Тишина обнаружена: $silenceCounter")
                         if (silenceCounter >= silenceWindowsRequired) {
                             Log.d("WavRecorder", "2 секунды тишины, остановка записи")
                             stopRecording()
@@ -93,7 +91,7 @@ class wavRecorder(
         audioRecord = null
 
         val audioData = floatBuffer.toFloatArray()
-        Log.d("WavRecorder", "Запись завершена, сэмплов: ${audioData.size}, сохранено в $filePath")
+        Log.d("WavRecorder", "Запись завершена, сэмплов: ${audioData.size}")
         saveToWavFile(audioData, filePath)
         onRecordingFinished(audioData)
         return audioData
@@ -138,7 +136,7 @@ class wavRecorder(
                 }
             }
         } catch (e: IOException) {
-            Log.e("WavRecorder", "Ошибка сохранения WAV: ${e.message}", e)
+            Log.e("WavRecorder", "Ошибка сохранения: ${e.message}", e)
         }
     }
 

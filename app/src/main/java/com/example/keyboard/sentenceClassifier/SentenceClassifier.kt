@@ -28,27 +28,26 @@ class SentenceClassifier(private val context: Context) {
             val model = loadModelFile("models/intonation_model.tflite")
             interpreter = Interpreter(model)
             isInitialized = true
-            Log.d("TFLiteClassifier", "TFLite model loaded successfully")
+            Log.d("TFLiteClassifier", "TFLite загрузилась")
         } catch (e: Exception) {
-            Log.e("TFLiteClassifier", "Error loading model: ${e.message}")
+            Log.e("TFLiteClassifier", "Ошибка загрузки модели: ${e.message}")
             isInitialized = false
         }
     }
 
     fun classify(text: String, features: FloatArray): String {
         if (!isInitialized || interpreter == null) {
-            Log.e("TFLiteClassifier", "Classifier not initialized")
+            Log.e("TFLiteClassifier", "Классификатор не ициниализирован")
             return text.trim().ifEmpty { "" } + "."
         }
         if (text.isEmpty()) {
-            Log.w("TFLiteClassifier", "Input text is empty")
+            Log.w("TFLiteClassifier", "Текст пустой")
             return "."
         }
 
         try {
             val expectedInputSize = interpreter?.getInputTensor(0)?.shape()?.reduce { a, b -> a * b } ?: 0
             if (features.size != expectedInputSize) {
-                Log.e("TFLiteClassifier", "Invalid features size: expected $expectedInputSize, got ${features.size}")
                 return text.trim() + "."
             }
 
@@ -67,10 +66,10 @@ class SentenceClassifier(private val context: Context) {
             val cleanedText = text.trim().removeSuffix(".").removeSuffix("?").removeSuffix("!")
             val result = "$cleanedText$punctuation"
 
-            Log.d("TFLiteClassifier", "Input: \"$text\" → Predicted: $predictedLabel → Output: \"$result\"")
+            Log.d("TFLiteClassifier", "Вход: \"$text\" -> Предикт: $predictedLabel → Выход: \"$result\"")
             return result
         } catch (e: Exception) {
-            Log.e("TFLiteClassifier", "Classification failed: ${e.message}", e)
+            Log.e("TFLiteClassifier", "Ошибка классификатора: ${e.message}", e)
             return text.trim() + "."
         }
     }

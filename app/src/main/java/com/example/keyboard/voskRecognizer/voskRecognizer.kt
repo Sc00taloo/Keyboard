@@ -25,7 +25,6 @@ class VoskRecognizer(private val context: Context) {
                 isModelInitialized = true
                 Log.d("VoskRecognizer", "Модель Vosk загружена из: $modelPath")
             } catch (e: Exception) {
-                Log.e("VoskRecognizer", "Ошибка загрузки модели Vosk", e)
                 throw RuntimeException("Ошибка загрузки модели Vosk", e)
             }
         }
@@ -33,7 +32,7 @@ class VoskRecognizer(private val context: Context) {
 
     fun startListening(onResult: (String) -> Unit) {
         if (!isModelInitialized) {
-            Log.e("VoskRecognizer", "Модель ещё не инициализирована")
+            Log.e("VoskRecognizer", "Модель не инициализирована")
             return
         }
         val recognizer = org.vosk.Recognizer(model, 16000.0f)
@@ -84,8 +83,6 @@ class VoskRecognizer(private val context: Context) {
         speechService?.shutdown()
         speechService = null
     }
-
-    fun getLastRecognizedText(): String? = lastRecognizedText
 
     private fun parseVoskResult(result: String): String {
         return try {

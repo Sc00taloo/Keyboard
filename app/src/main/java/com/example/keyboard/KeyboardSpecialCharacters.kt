@@ -1,12 +1,17 @@
 package com.example.keyboard
 
+import android.Manifest
+import android.content.pm.PackageManager
 import android.os.Handler
 import android.os.Looper
+import android.util.Log
 import android.view.KeyEvent
 import android.view.MotionEvent
 import android.view.View
+import android.view.ViewGroup
 import android.widget.Button
 import android.widget.ImageButton
+import androidx.core.content.ContextCompat
 import com.example.keyboard.databinding.KeyboardSpecialCharactersLayoutBinding
 import kotlin.math.abs
 
@@ -70,10 +75,39 @@ class KeyboardSpecialCharacters(private val parentService: Keyboard) {
             }
         })
         //// NEED!!!!!!!!!!!!!!!!!!!!!
-        keyboarding.btnVoiceInput.setOnClickListener{
-            val input = parentService.currentInputConnection
-            input?.sendKeyEvent(KeyEvent(KeyEvent.ACTION_DOWN, KeyEvent.KEYCODE_SPACE))
-            return@setOnClickListener
+        keyboarding.btnVoiceInput.apply {
+            isClickable = true
+            isFocusable = true
+            isEnabled = true
+            Log.d("KeyboardNumbers", "Кнопка голосового ввода инициализирована для языка: ${if (parentService.getCurrentLanguage() == Language.EN) "Английский" else "Русский"}")
+
+            setOnClickListener {
+                Log.d("KeyboardNumbers", "Кнопка голосового ввода нажата: ${if (parentService.getCurrentLanguage() == Language.EN) "en-US" else "ru-RU"}")
+                Log.d("KeyboardNumbers", "Текущее соединение ввода: ${if (parentService.currentInputConnection == null) "отсутствует" else "есть"}")
+                Log.d("KeyboardNumbers", "root элемент: ${if (keyboarding.root.parent != null) "присутствует" else "отсутствует"}")
+
+                try {
+                    if (ContextCompat.checkSelfPermission(parentService, Manifest.permission.RECORD_AUDIO) == PackageManager.PERMISSION_GRANTED) {
+                        if (keyboarding.root.parent != null) {
+                            Log.d("KeyboardNumbers", "Разрешение на запись получено")
+                            parentService.voiceInputAnimation.showVoiceInputField(keyboarding.root.parent as ViewGroup, parentService.currentInputConnection)
+                            parentService.microphone.startVoiceInput(if (parentService.getCurrentLanguage() == Language.EN) "en-US" else "ru-RU")
+                        } else {
+                            Log.e("KeyboardNumbers", "Ошибка, отсутствует родительский элемент")
+                        }
+                    } else {
+                        Log.d("KeyboardNumbers", "Разрешение на запись не получено")
+                        parentService.requestMicrophone.requestMicrophonePermission()
+                    }
+                } catch (e: Exception) {
+                    Log.e("KeyboardNumbers", "Ошибка при нажатии кнопки голосового ввода: ${e.message}", e)
+                }
+            }
+
+            setOnTouchListener { _, event ->
+                Log.d("KeyboardNumbers", "Кнопка голосового ввода нажата: действие ${event.action}")
+                false
+            }
         }
         //// NEED!!!!!!!!!!!!!!!!!!!!!
 

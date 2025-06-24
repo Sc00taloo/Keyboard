@@ -78,9 +78,12 @@ class SpellChecker(private val context: Context, private val inputConnection: an
             for (j in 1..s2.length) {
                 val cost = if (s1[i - 1] == s2[j - 1]) 0 else 1
                 dp[i][j] = minOf(
-                    dp[i - 1][j] + 1, // удаление
-                    dp[i][j - 1] + 1, // вставка
-                    dp[i - 1][j - 1] + cost // замена
+                    // удаление
+                    dp[i - 1][j] + 1,
+                    // вставка
+                    dp[i][j - 1] + 1,
+                    // замена
+                    dp[i - 1][j - 1] + cost
                 )
             }
         }
@@ -93,15 +96,13 @@ class SpellChecker(private val context: Context, private val inputConnection: an
             return
         }
 
-        // Проверяем только последнее слово для оптимизации
         val lastWord = text.trim().split(" ").lastOrNull() ?: return
         if (lastWord == lastInput && language == lastLanguage) {
-            return // Пропускаем, если ввод не изменился
+            return
         }
         lastInput = lastWord
         lastLanguage = language
 
-        // Отменяем предыдущую задачу
         suggestionJob?.cancel()
         suggestionJob = scope.launch {
             try {
@@ -130,7 +131,7 @@ class SpellChecker(private val context: Context, private val inputConnection: an
                     showSuggestions(rootView, suggestions, text, hasSpaceBefore)
                 }
             } catch (e: Exception) {
-                Log.e("SpellChecker", "Failed to process suggestions: ${e.message}")
+                Log.e("SpellChecker", "Ошибка в обработке предложения: ${e.message}")
                 withContext(Dispatchers.Main) {
                     clearSuggestions(rootView)
                 }
@@ -141,7 +142,7 @@ class SpellChecker(private val context: Context, private val inputConnection: an
     private fun showSuggestions(rootView: View, suggestions: List<String>, currentText: String, hasSpaceBefore: Boolean) {
         val suggestionContainer = rootView.findViewById<LinearLayout>(R.id.suggestion_container)
         suggestionContainer?.removeAllViews()
-        Log.d("SpellChecker", "Showing suggestions: $suggestions")
+        Log.d("SpellChecker", "Предложения: $suggestions")
 
         val textViewPool = mutableListOf<TextView>()
         for (i in 0 until suggestionContainer.childCount) {
@@ -166,7 +167,7 @@ class SpellChecker(private val context: Context, private val inputConnection: an
                     suggestionContainer.removeAllViews()
                     onSuggestionSelected()
                 } catch (e: Exception) {
-                    Log.e("SpellChecker", "Failed to commit suggestion: ${e.message}")
+                    Log.e("SpellChecker", "Ошибка фиксации: ${e.message}")
                 }
             }
             suggestionContainer.addView(textView)

@@ -22,7 +22,7 @@ class voiceInputAnimation(
 
     fun showVoiceInputField(parent: ViewGroup, newInputConnection: InputConnection?) {
         inputConnection = newInputConnection
-        currentText = "" // Сбрасываем текст
+        currentText = ""
         try {
             if (voiceInputView == null) {
                 voiceInputBinding = VoiceInputLayoutBinding.inflate(android.view.LayoutInflater.from(context))
@@ -36,7 +36,7 @@ class voiceInputAnimation(
                     return
                 }
 
-                // Настройка кнопки OK
+                //OK
                 voiceInputBinding?.confirmButton?.setOnClickListener {
                     val text = voiceInputBinding?.voiceInputEditText?.text?.toString() ?: currentText
                     if (text.isNotEmpty() && text.trimEnd('.', '!', '?') != context.getString(R.string.not_recognized)) {
@@ -51,11 +51,10 @@ class voiceInputAnimation(
                 Log.d("VoiceInputAnimation", "Используется существующее поле голосового ввода")
             }
 
-            // Сбрасываем состояние EditText при каждом вызове
             mainHandler.post {
                 voiceInputBinding?.voiceInputEditText?.apply {
-                    setText("") // Очищаем текст
-                    hint = context.getString(R.string.speak_hint) // Устанавливаем "Говорите..."
+                    setText("")
+                    hint = context.getString(R.string.speak_hint)
                 }
                 Log.d("VoiceInputAnimation", "Состояние EditText сброшено, hint: '${voiceInputBinding?.voiceInputEditText?.hint}'")
             }
@@ -89,9 +88,9 @@ class voiceInputAnimation(
                 setText(currentText)
                 hint = if (currentText.isEmpty()) {
                     if (cleanedText == context.getString(R.string.not_recognized)) {
-                        context.getString(R.string.not_recognized) // "Не распознано" как hint
+                        context.getString(R.string.not_recognized)
                     } else {
-                        context.getString(R.string.speak_hint) // "Говорите..."
+                        context.getString(R.string.speak_hint)
                     }
                 } else {
                     null

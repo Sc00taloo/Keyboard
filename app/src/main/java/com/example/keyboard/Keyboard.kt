@@ -39,10 +39,10 @@ class Keyboard : InputMethodService() {
     private var currentLanguage = Language.EN
     val keyboardNumbers = KeyboardNumbers(this)
 
-    private lateinit var microphone: Microphone
-    private lateinit var requestMicrophone: requestMicrophone
+    lateinit var microphone: Microphone
+    lateinit var requestMicrophone: requestMicrophone
 
-    private lateinit var voiceInputAnimation: voiceInputAnimation
+    lateinit var voiceInputAnimation: voiceInputAnimation
 
     private val keyboardSpecialCharacters = KeyboardSpecialCharacters(this)
 
@@ -259,35 +259,36 @@ class Keyboard : InputMethodService() {
             isClickable = true
             isFocusable = true
             isEnabled = true
-            Log.d("Keyboard", "btnVoiceInput found for ${if (keyboarding is KeyboardLayoutBinding) "EN" else "RU"}")
+            Log.d("Keyboard", "Кнопка голосового ввода найдена для языка: ${if (keyboarding is KeyboardLayoutBinding) "Английский" else "Русский"}")
+
             setOnClickListener {
-                Log.d("Keyboard", "btnVoiceInput clicked, language: ${if (currentLanguage == Language.EN) "en-US" else "ru-RU"}")
-                Log.d("Keyboard", "CurrentInputConnection is ${if (currentInputConnection == null) "null" else "valid"}")
-                Log.d("Keyboard", "Parent is ${if (rootView.parent != null) "valid" else "null"}")
+                Log.d("Keyboard", "Кнопка голосового ввода нажата: ${if (currentLanguage == Language.EN) "en-US" else "ru-RU"}")
+                Log.d("Keyboard", "Текущее соединение ввода: ${if (currentInputConnection == null) "отсутствует" else "есть"}")
+                Log.d("Keyboard", "root элемент: ${if (rootView.parent != null) "присутствует" else "отсутствует"}")
                 try {
                     if (ContextCompat.checkSelfPermission(this@Keyboard, Manifest.permission.RECORD_AUDIO) == PackageManager.PERMISSION_GRANTED) {
                         if (rootView.parent != null) {
-                            Log.d("Keyboard", "Permission granted, starting voice input")
+                            Log.d("Keyboard", "Разрешение на запись получено")
                             voiceInputAnimation.showVoiceInputField(rootView.parent as ViewGroup, currentInputConnection)
                             microphone.startVoiceInput(if (currentLanguage == Language.EN) "en-US" else "ru-RU")
                         } else {
-                            Log.e("Keyboard", "Parent is null, cannot show voice input field")
+                            Log.e("Keyboard", "Ошибка, отсутствует родительский элемент")
                         }
                     } else {
-                        Log.d("Keyboard", "Permission not granted, requesting permission")
+                        Log.d("Keyboard", "Разрешение на запись не получено")
                         requestMicrophone.requestMicrophonePermission()
                     }
                 } catch (e: Exception) {
-                    Log.e("Keyboard", "Error in btnVoiceInput click: ${e.message}", e)
+                    Log.e("Keyboard", "Ошибка при нажатии кнопки голосового ввода: ${e.message}", e)
                 }
             }
+
             setOnTouchListener { _, event ->
-                Log.d("Keyboard", "btnVoiceInput touched: ${event.action}")
+                Log.d("Keyboard", "Кнопка голосового ввода нажата: действие ${event.action}")
                 false
             }
-        } ?: Log.e("Keyboard", "btnVoiceInput not found in layout for ${if (keyboarding is KeyboardLayoutBinding) "EN" else "RU"}")
+        }
         // NEED!!!!!!!!!!!!!!!!!!!!!
-
         val btnEnter = rootView.findViewById<Button>(R.id.btnEnter)
         btnEnter?.setOnClickListener {
             currentInputConnection?.sendKeyEvent(
